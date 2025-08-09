@@ -6,6 +6,7 @@ export {
   camera,
   renderer,
   controls,
+  sunLight,
 } from './environment.js';
 export { ground, heightAt, maybeRecenterGround, rebuildGround } from './terrain.js';
 export {
