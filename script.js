@@ -131,6 +131,7 @@
 
     let fallbackActive = false;
     let isActive = false;
+    let mouseEnabled = false;
 
     function showUI(active){
       overlay.style.display = active ? 'none' : 'grid';
@@ -166,8 +167,22 @@
     }
 
     startBtn.addEventListener('click', tryEnter);
-    controls.addEventListener('lock', ()=>{ isActive=true; fallbackActive=false; showUI(true); updatePreview(); });
-    controls.addEventListener('unlock', ()=>{ isActive=false; showUI(false); });
+
+    window.addEventListener('mousedown', (e)=>{
+      if(e.button === 2 && !fallbackActive){
+        e.preventDefault();
+        if(controls.isLocked){
+          mouseEnabled = true;
+          controls.unlock();
+        }else if(mouseEnabled){
+          mouseEnabled = false;
+          controls.lock();
+        }
+      }
+    });
+
+    controls.addEventListener('lock', ()=>{ isActive=true; fallbackActive=false; mouseEnabled=false; showUI(true); updatePreview(); });
+    controls.addEventListener('unlock', ()=>{ if(mouseEnabled){ showUI(true); } else { isActive=false; showUI(false); } });
 
     // Movement
     const move = { forward:false, back:false, left:false, right:false, run:false };
