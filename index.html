@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Interactive 3D World — Run & Jump (Single HTML)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="overlay">
+    <div id="ui">
+      <h1>Interactive 3D World</h1>
+      <p>Click <em>Start</em> to enter the world.<br/>
+         Move with <code>W A S D</code>, jump with <code>Space</code>, run with <code>Shift</code>.<br/>
+         If pointer lock is blocked by the sandbox, it will switch to a safe fallback:
+         <em>hold left mouse button and drag to look</em>.</p>
+      <button id="start">Start</button>
+    </div>
+  </div>
+
+  <!-- Settings & Builder panels -->
+  <button id="builderToggle" hidden>Builder: On</button>
+
+  <div id="settings" class="panel" hidden>
+    <div class="header" id="settingsHandle"><span class="title">Settings</span></div>
+    <div class="panel-body">
+      <h2>Movement</h2>
+      <div class="row"><label for="speed">Speed</label>
+        <input id="speed" type="number" min="0.1" step="0.1" value="10" />
+      </div>
+      <div class="row"><label for="runmul">Run ×</label>
+        <input id="runmul" type="number" min="1" step="0.1" value="1.8" />
+      </div>
+      <div class="row"><label for="jump">Jump</label>
+        <input id="jump" type="number" min="0.1" step="0.1" value="11.5" />
+      </div>
+      <div class="row"><label for="stepH">Step Ht</label>
+        <input id="stepH" type="number" min="0" step="0.05" value="0.5" />
+      </div>
+      <h2 style="margin-top:10px">World</h2>
+      <div class="row"><label for="viewDist">View dist (chunks)</label>
+        <input id="viewDist" type="number" min="1" max="12" step="1" value="5" />
+      </div>
+      <div class="row"><label for="chunkSize">Chunk size</label>
+        <input id="chunkSize" type="number" min="8" max="128" step="8" value="32" />
+      </div>
+    </div>
+  </div>
+
+  <div id="builder" class="panel" hidden>
+    <div class="header" id="builderHandle"><span class="title">Builder</span></div>
+    <div class="panel-body">
+      <h2>Spawn Block</h2>
+      <div class="row"><label for="shape">Type</label>
+        <select id="shape">
+          <option value="cube" selected>Cube</option>
+          <option value="pyramid">Pyramid</option>
+          <option value="sphere">Sphere</option>
+        </select>
+      </div>
+      <div class="row"><label for="color">Color</label>
+        <input id="color" type="color" value="#6ee7ff" />
+      </div>
+      <div class="row"><label for="sx">Size X</label>
+        <input id="sx" type="number" min="0.1" step="0.1" value="4" />
+      </div>
+      <div class="row"><label for="sy">Size Y</label>
+        <input id="sy" type="number" min="0.1" step="0.1" value="1" />
+      </div>
+      <div class="row"><label for="sz">Size Z</label>
+        <input id="sz" type="number" min="0.1" step="0.1" value="4" />
+      </div>
+      <button id="spawn">Spawn at Crosshair</button>
+    </div>
+  </div>
+
+  <div id="crosshair" hidden></div>
+  <div id="hud" hidden>WASD = move | Space = jump | Shift = run</div>
+  <div id="fps" hidden>FPS</div>
+  <div id="tests" hidden>Running tests…</div>
+  <div id="warn" hidden>Pointer lock blocked; using drag-to-look (hold mouse to look)</div>
+
+  <!-- Import map so bare specifiers resolve in the browser -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
