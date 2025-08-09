@@ -4,6 +4,7 @@ import {
   controls,
   camera,
   renderer,
+  sunLight,
   ground,
   blocks,
   fpsBox,
@@ -310,6 +311,10 @@ function animate() {
     }
 
     maybeRecenterGround(obj.position.x, obj.position.z);
+    // Reposition sunlight to follow the player for consistent shadow coverage
+    sunLight.position.set(obj.position.x + 20, obj.position.y + 80, obj.position.z + 10);
+    sunLight.target.position.set(obj.position.x, obj.position.y, obj.position.z);
+    sunLight.target.updateMatrixWorld();
   }
 
   renderer.render(scene, camera);

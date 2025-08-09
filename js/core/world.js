@@ -1,5 +1,6 @@
 import { THREE, scene } from './environment.js';
 import { ground } from './terrain.js';
+import { createBlockMaterial } from './shaders.js';
 
 const grid = new THREE.GridHelper(400, 80, 0x7aa2ff, 0x2b3d55);
 grid.material.opacity = 0.25;
@@ -15,10 +16,9 @@ blocks.add(chunksGroup);
 const userGroup = new THREE.Group();
 blocks.add(userGroup);
 
-const baseMat = new THREE.MeshStandardMaterial({ color: 0x6ee7ff, roughness: 0.6, metalness: 0.15 });
-function addBlockTo(group, x, y, z, sx = 4, sy = 1, sz = 4, color = null) {
-  const mat = baseMat.clone();
-  if (color !== null) mat.color = new THREE.Color(color);
+function addBlockTo(group, x, y, z, sx = 4, sy = 1, sz = 4, color = 0x6ee7ff) {
+  // Use custom shader material for lighting and shadow support
+  const mat = createBlockMaterial(color);
   const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), mat);
   m.position.set(x, y + sy / 2, z);
   m.castShadow = m.receiveShadow = true;

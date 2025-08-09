@@ -15,6 +15,8 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
+// Use soft shadows for a smoother appearance
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 // Atmosphere sky
@@ -37,11 +39,19 @@ setSun(22, 140);
 // Lights
 const hemi = new THREE.HemisphereLight(0xddeeff, 0x223344, 0.8);
 scene.add(hemi);
-const dir = new THREE.DirectionalLight(0xffffff, 0.9);
-dir.position.set(20, 80, 10);
-dir.castShadow = true;
-dir.shadow.mapSize.set(2048, 2048);
-scene.add(dir);
+const sunLight = new THREE.DirectionalLight(0xffffff, 0.9);
+sunLight.position.set(20, 80, 10);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.set(2048, 2048);
+// Widen the shadow camera so distant blocks can still receive and cast shadows
+const shadowRange = 100;
+sunLight.shadow.camera.near = 1;
+sunLight.shadow.camera.far = 500;
+sunLight.shadow.camera.left = -shadowRange;
+sunLight.shadow.camera.right = shadowRange;
+sunLight.shadow.camera.top = shadowRange;
+sunLight.shadow.camera.bottom = -shadowRange;
+scene.add(sunLight);
 
 // Controls
 const controls = new PointerLockControls(camera, document.body);
@@ -56,4 +66,5 @@ export {
   renderer,
   controls,
   setSun,
+  sunLight,
 };
