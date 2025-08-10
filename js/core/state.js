@@ -5,7 +5,7 @@ const state = {
   worldSeed: 1,
   mountainAmp: 240,
   valleyAmp: 20,
-  terrainType: 'basic',
+  terrainType: 'terragen',
 };
 
 // Update the global seed used for terrain and chunk generation.
