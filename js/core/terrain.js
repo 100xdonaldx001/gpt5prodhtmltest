@@ -77,7 +77,8 @@ function fbm2D(x, z) {
 // Height map producing smooth ground with taller mountains.
 function heightAt(x, z) {
   const n = fbm2D(x * 0.005, z * 0.005);
-  const mountain = Math.pow(Math.max(0, n), 3) * 120;
+  // Amplify mountain heights for more dramatic terrain.
+  const mountain = Math.pow(Math.max(0, n), 3) * 240;
   const valley = -Math.pow(Math.max(0, -n), 2) * 20;
   return mountain + valley;
 }
