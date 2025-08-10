@@ -78,6 +78,17 @@ function ridgedFbm2D(x, z) {
   return total;
 }
 
+// Smooth the ridged noise by averaging nearby samples.
+function smoothedRidgedFbm2D(x, z) {
+  const s = 0.005; // sample spacing for smoothing
+  const h = ridgedFbm2D(x, z);
+  const h1 = ridgedFbm2D(x + s, z);
+  const h2 = ridgedFbm2D(x - s, z);
+  const h3 = ridgedFbm2D(x, z + s);
+  const h4 = ridgedFbm2D(x, z - s);
+  return (h + h1 + h2 + h3 + h4) / 5;
+}
+
 // Basic terrain with smooth mountains, valleys, and rivers.
 function basicHeightAt(x, z) {
   // Blend several noise layers for varied terrain features.
@@ -97,8 +108,9 @@ function basicHeightAt(x, z) {
 
 // Terragen-like terrain using ridged noise for craggy peaks.
 function terragenHeightAt(x, z) {
-  const ridged = ridgedFbm2D(x * 0.01, z * 0.01);
-  const detail = fbm2D((x + 2000) * 0.03, (z + 2000) * 0.03) * 0.1;
+  const scale = 0.001; // enlarge terrain features by 10x
+  const ridged = smoothedRidgedFbm2D(x * scale, z * scale);
+  const detail = fbm2D((x + 2000) * scale * 3, (z + 2000) * scale * 3) * 0.1;
   return (ridged * 0.8 + detail) * state.mountainAmp - 5;
 }
 
