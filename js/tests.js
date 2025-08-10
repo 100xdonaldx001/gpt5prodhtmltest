@@ -42,4 +42,3 @@ export function runTests() {
   res.details.forEach(tlog);
   testsBox.textContent = summary;
 }
-runTests();

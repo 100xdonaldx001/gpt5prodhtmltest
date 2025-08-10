@@ -16,6 +16,7 @@ import {
   procToggle,
   worldgenPanel,
   state,
+  debugPanel,
   } from '../core/index.js';
   import { updatePreview } from '../builder/preview.js';
 
@@ -34,6 +35,8 @@ function showUI(active) {
   builderToggle.hidden = !active;
   procToggle.hidden = !active;
   if (!active) builder.hidden = true;
+  // Show or hide debug options with the main UI.
+  debugPanel.hidden = !active;
   warnBox.hidden = !(active && fallbackActive);
 }
 

@@ -5,6 +5,8 @@ import {
   builderHandle,
   worldgenPanel,
   worldHandle,
+  debugPanel,
+  debugHandle,
 } from './core/index.js';
 
 function constrainPanel(panel) {
@@ -73,3 +75,4 @@ function makeDraggable(panel, handle, storageKey) {
 makeDraggable(settingsPanel, settingsHandle, 'ui.settings.pos');
 makeDraggable(builder, builderHandle, 'ui.builder.pos');
 makeDraggable(worldgenPanel, worldHandle, 'ui.worldgen.pos');
+makeDraggable(debugPanel, debugHandle, 'ui.debug.pos');
