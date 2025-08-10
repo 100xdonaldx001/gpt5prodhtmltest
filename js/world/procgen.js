@@ -83,6 +83,8 @@ function resetChunks() {
 
 let lastChunkUpdate = 0;
 function updateChunks(force = false, forcedPos = null) {
+  // Skip updates when ground generation is disabled via debug menu.
+  if (window.__DEBUG && !window.__DEBUG.ground) return;
   const now = performance.now();
   if (!force && now - lastChunkUpdate < 250) return;
   lastChunkUpdate = now;

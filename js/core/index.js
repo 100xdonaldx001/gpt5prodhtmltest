@@ -60,5 +60,10 @@ export {
   regenBtn,
   mountainAmpInp,
   valleyAmpInp,
+  debugPanel,
+  debugHandle,
+  dbgTests,
+  dbgMovement,
+  dbgGround,
 } from './dom.js';
 export { state, setWorldSeed, setTerrainAmps } from './state.js';

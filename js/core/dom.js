@@ -37,6 +37,12 @@ const regenBtn = document.getElementById('regen');
 const mountainAmpInp = document.getElementById('mountainAmp');
 const valleyAmpInp = document.getElementById('valleyAmp');
 
+const debugPanel = document.getElementById('debug');
+const debugHandle = document.getElementById('debugHandle');
+const dbgTests = document.getElementById('dbgTests');
+const dbgMovement = document.getElementById('dbgMovement');
+const dbgGround = document.getElementById('dbgGround');
+
 export {
   overlay,
   startBtn,
@@ -74,4 +80,9 @@ export {
   regenBtn,
   mountainAmpInp,
   valleyAmpInp,
+  debugPanel,
+  debugHandle,
+  dbgTests,
+  dbgMovement,
+  dbgGround,
 };

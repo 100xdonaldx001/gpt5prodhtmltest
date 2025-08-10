@@ -57,7 +57,8 @@ function animate() {
     acc = 0;
   }
   updateChunks();
-  if (state.isActive) {
+  // Only update player motion when enabled in the debug menu.
+  if (state.isActive && (!window.__DEBUG || window.__DEBUG.movement)) {
     const sF = (move.forward ? 1 : 0) - (move.back ? 1 : 0);
     const sR = (move.right ? 1 : 0) - (move.left ? 1 : 0);
     movement.walk = Math.max(0.1, parseFloat(speedInp.value) || 10);
