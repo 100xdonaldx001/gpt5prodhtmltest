@@ -27,6 +27,7 @@ const jumpInp = document.getElementById('jump');
 const stepHInp = document.getElementById('stepH');
 const viewDistInp = document.getElementById('viewDist');
 const chunkSizeInp = document.getElementById('chunkSize');
+const seaLevelInp = document.getElementById('seaLevel');
 
 const worldgenPanel = document.getElementById('worldgen');
 const worldHandle = document.getElementById('worldHandle');
@@ -71,6 +72,7 @@ export {
   stepHInp,
   viewDistInp,
   chunkSizeInp,
+  seaLevelInp,
   worldgenPanel,
   worldHandle,
   seedInp,

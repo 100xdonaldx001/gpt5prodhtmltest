@@ -27,6 +27,7 @@ import {
   maybeRecenterGround,
   rebuildAABBs,
   updateEnvironment,
+  alignPlayerToGround,
 } from '../../core/index.js';
 import { constrainPanel } from '../../ui.js';
 import movement from './state.js';
@@ -118,6 +119,7 @@ function animate() {
     if (obj.position.y < -20) {
       obj.position.set(0, movement.playerHeight + 1, 0);
       movement.vForward = movement.vRight = movement.vY = 0;
+      alignPlayerToGround();
     }
     controls.moveForward(movement.vForward * delta);
     controls.moveRight(movement.vRight * delta);
@@ -170,3 +172,4 @@ window.addEventListener('resize', () => {
   constrainPanel(worldgenPanel);
 });
 controls.getObject().position.set(0, movement.playerHeight + 1, 8);
+alignPlayerToGround();

@@ -3,7 +3,7 @@ import { createTerrainMaterial } from '../core/shaders.js';
 import { heightAt } from './heightmap.js';
 
 // Water level for oceans, lakes, and rivers
-const SEA_LEVEL = -10;
+let SEA_LEVEL = -10;
 
 // Allow the ground plane to expand as view distance increases
 let groundSize = 800;
@@ -89,4 +89,19 @@ function maybeRecenterGround(playerX, playerZ) {
   return { shifted: false, dx: 0, dz: 0 };
 }
 
-export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize };
+// Update sea level and rebuild water position
+function setSeaLevel(newLevel) {
+  SEA_LEVEL = newLevel;
+  rebuildGround();
+}
+
+export {
+  ground,
+  water,
+  SEA_LEVEL,
+  heightAt,
+  maybeRecenterGround,
+  rebuildGround,
+  setGroundSize,
+  setSeaLevel,
+};

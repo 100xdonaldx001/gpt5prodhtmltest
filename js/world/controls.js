@@ -13,9 +13,11 @@ import {
   setWorldSeed,
   setTerrainAmps,
   setTerrainType,
+  setSeaLevel,
   controls,
   heightAt,
   SEA_LEVEL,
+  seaLevelInp,
   } from '../core/index.js';
 
 // Generate a random 32-bit seed.
@@ -69,3 +71,16 @@ procToggle.addEventListener('click', () => {
   const on = toggleProcgen();
   procToggle.textContent = on ? 'Objects: On' : 'Objects: Off';
 });
+
+// Update sea level when the option changes
+seaLevelInp.addEventListener('change', () => {
+  let level = parseFloat(seaLevelInp.value);
+  if (!Number.isFinite(level)) {
+    level = -10;
+    seaLevelInp.value = level;
+  }
+  setSeaLevel(level);
+  alignPlayerToGround();
+});
+
+export { alignPlayerToGround };

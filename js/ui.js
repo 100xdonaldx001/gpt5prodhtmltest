@@ -76,3 +76,21 @@ makeDraggable(settingsPanel, settingsHandle, 'ui.settings.pos');
 makeDraggable(builder, builderHandle, 'ui.builder.pos');
 makeDraggable(worldgenPanel, worldHandle, 'ui.worldgen.pos');
 makeDraggable(debugPanel, debugHandle, 'ui.debug.pos');
+
+// Set default positions so panels don't overlap on first load
+if (!localStorage.getItem('ui.settings.pos')) {
+  settingsPanel.style.left = '12px';
+  settingsPanel.style.top = '60px';
+}
+if (!localStorage.getItem('ui.builder.pos')) {
+  builder.style.left = '12px';
+  builder.style.top = '248px';
+}
+if (!localStorage.getItem('ui.worldgen.pos')) {
+  worldgenPanel.style.left = '12px';
+  worldgenPanel.style.top = '436px';
+}
+if (!localStorage.getItem('ui.debug.pos')) {
+  debugPanel.style.left = '12px';
+  debugPanel.style.top = '624px';
+}
