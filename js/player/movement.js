@@ -12,6 +12,7 @@ import {
   fpsBox,
   settingsPanel,
   builder,
+  worldgenPanel,
   speedInp,
   runMulInp,
   jumpInp,
@@ -356,5 +357,6 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   constrainPanel(settingsPanel);
   constrainPanel(builder);
+  constrainPanel(worldgenPanel);
 });
 controls.getObject().position.set(0, 1.75 + 1, 8);
