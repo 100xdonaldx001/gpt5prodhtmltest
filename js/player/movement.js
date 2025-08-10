@@ -104,6 +104,10 @@ function onKeyUp(e) {
 }
 document.addEventListener('keydown', onKeyDown);
 document.addEventListener('keyup', onKeyUp);
+sunColorInp.addEventListener('change', () => {
+  // Unfocus color picker so movement keys aren't captured
+  sunColorInp.blur();
+});
 
 const downRay = new THREE.Raycaster();
 
