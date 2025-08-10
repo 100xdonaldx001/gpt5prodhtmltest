@@ -1,5 +1,5 @@
 import { THREE, scene } from '../core/environment.js';
-import { createVoxelTerrainMaterial } from '../core/shaders.js';
+import { createTerrainMaterial } from '../core/shaders.js';
 import { heightAt } from './heightmap.js';
 
 // Water level for oceans, lakes, and rivers
@@ -7,7 +7,7 @@ const SEA_LEVEL = -10;
 
 // Allow the ground plane to expand as view distance increases
 let groundSize = 800;
-const GRID_STEP = 8; // spacing between ground vertices
+const GRID_STEP = 2; // spacing between ground vertices for a smoother mesh
 function createGroundGeo(size) {
   const seg = Math.max(1, Math.floor(size / GRID_STEP)); // keep detail consistent
   const geo = new THREE.PlaneGeometry(size, size, seg, seg);
@@ -15,8 +15,8 @@ function createGroundGeo(size) {
   return geo;
 }
 let groundGeo = createGroundGeo(groundSize);
-// Shader material snaps vertices to a grid so smooth ground appears voxel-like
-const groundMat = createVoxelTerrainMaterial();
+// Standard material gives smooth ground without blocky artifacts
+const groundMat = createTerrainMaterial();
 const ground = new THREE.Mesh(groundGeo, groundMat);
 // Allow terrain to cast shadows on itself so mountains block light.
 ground.castShadow = ground.receiveShadow = true;

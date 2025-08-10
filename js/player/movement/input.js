@@ -1,4 +1,4 @@
-import { sunColorInp, state } from '../../core/index.js';
+import { state } from '../../core/index.js';
 import { toggleBuilder } from '../../builder/index.js';
 import movement from './state.js';
 
@@ -63,7 +63,3 @@ function onKeyUp(e) {
 }
 document.addEventListener('keydown', onKeyDown);
 document.addEventListener('keyup', onKeyUp);
-sunColorInp.addEventListener('change', () => {
-  // Unfocus color picker so movement keys aren't captured
-  sunColorInp.blur();
-});
