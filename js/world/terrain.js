@@ -64,6 +64,7 @@ function setGroundSize(newSize) {
 }
 
 function maybeRecenterGround(playerX, playerZ) {
+  // Rebuild ground and water meshes when the player wanders too far.
   const dx = playerX - groundCenter.x;
   const dz = playerZ - groundCenter.y;
   const threshold = groundSize * 0.25;
@@ -71,7 +72,9 @@ function maybeRecenterGround(playerX, playerZ) {
     groundCenter.x = Math.round(playerX / (groundSize * 0.25)) * (groundSize * 0.25);
     groundCenter.y = Math.round(playerZ / (groundSize * 0.25)) * (groundSize * 0.25);
     rebuildGround();
+    return true; // Signal that terrain was recentered
   }
+  return false;
 }
 
 export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize };

@@ -40,6 +40,10 @@ function approach(cur, target, maxStep) {
   if (cur > target) return Math.max(target, cur - maxStep);
   return cur;
 }
+function applyDeadzone(v, threshold = 1e-3) {
+  // Remove tiny residual velocity to prevent drifting
+  return Math.abs(v) < threshold ? 0 : v;
+}
 function animate() {
   requestAnimationFrame(animate);
   const delta = Math.min(clock.getDelta(), 0.05);
@@ -82,6 +86,8 @@ function animate() {
     const damping = Math.max(0.8, 1 - 8 * delta);
     if (sF === 0) movement.vForward *= damping;
     if (sR === 0) movement.vRight *= damping;
+    movement.vForward = applyDeadzone(movement.vForward);
+    movement.vRight = applyDeadzone(movement.vRight);
     movement.vY -= movement.gravity * delta;
     const obj = controls.getObject();
     const prevY = obj.position.y;
