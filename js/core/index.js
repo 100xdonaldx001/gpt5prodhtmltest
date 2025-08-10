@@ -29,6 +29,7 @@ export {
   hud,
   crosshair,
   fpsBox,
+  posBox,
   testsBox,
   warnBox,
   settingsPanel,

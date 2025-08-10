@@ -7,6 +7,7 @@ import {
   hud,
   crosshair,
   fpsBox,
+  posBox,
   testsBox,
   warnBox,
   settingsPanel,
@@ -26,6 +27,7 @@ function showUI(active) {
   hud.hidden = !active;
   crosshair.hidden = !active;
   fpsBox.hidden = !active;
+  posBox.hidden = !active;
   testsBox.hidden = !active;
   settingsPanel.hidden = !active;
   worldgenPanel.hidden = !active;

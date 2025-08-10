@@ -11,6 +11,7 @@ import {
   ground,
   blocks,
   fpsBox,
+  posBox,
   settingsPanel,
   builder,
   worldgenPanel,
@@ -136,6 +137,9 @@ function animate() {
     sunLight.target.position.copy(obj.position);
     sunLight.target.updateMatrixWorld();
     sky.position.copy(obj.position);
+    // Show current player position
+    posBox.textContent =
+      `X: ${obj.position.x.toFixed(1)} Y: ${obj.position.y.toFixed(1)} Z: ${obj.position.z.toFixed(1)}`;
   }
   renderer.render(scene, camera);
 }
