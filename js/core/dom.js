@@ -6,6 +6,7 @@ const fpsBox = document.getElementById('fps');
 const testsBox = document.getElementById('tests');
 const warnBox = document.getElementById('warn');
 const posBox = document.getElementById('pos');
+const timeBox = document.getElementById('time');
 
 const settingsPanel = document.getElementById('settings');
 const settingsHandle = document.getElementById('settingsHandle');
@@ -51,6 +52,7 @@ export {
   crosshair,
   fpsBox,
   posBox,
+  timeBox,
   testsBox,
   warnBox,
   settingsPanel,
