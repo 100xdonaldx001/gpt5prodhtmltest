@@ -31,6 +31,7 @@ export {
   crosshair,
   fpsBox,
   posBox,
+  timeBox,
   testsBox,
   warnBox,
   settingsPanel,
