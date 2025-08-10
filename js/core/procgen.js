@@ -2,7 +2,7 @@ import { THREE, controls } from './environment.js';
 import { chunksGroup, addBlockTo, rebuildAABBs } from './world.js';
 import { chunkSizeInp, viewDistInp } from './dom.js';
 import { state } from './state.js';
-import { ensureGroundSize } from './terrain.js';
+import { setGroundSize } from './terrain.js';
 
 function mulberry32(a) {
   return function () {
@@ -86,8 +86,8 @@ function updateChunks(force = false, forcedPos = null) {
   lastChunkUpdate = now;
   CHUNK_SIZE = Math.max(8, parseInt(chunkSizeInp.value) || 32);
   VIEW_DIST = Math.max(1, Math.min(64, parseInt(viewDistInp.value) || 10));
-  // Ensure terrain plane spans the current view distance
-  ensureGroundSize((VIEW_DIST * 2 + 2) * CHUNK_SIZE);
+  // Sync ground plane to current view distance
+  setGroundSize((VIEW_DIST * 2 + 2) * CHUNK_SIZE);
 
   const obj = controls.getObject();
   const px = forcedPos ? forcedPos.x : obj.position.x;
