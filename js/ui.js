@@ -1,4 +1,11 @@
-import { settingsPanel, settingsHandle, builder, builderHandle } from './core/index.js';
+import {
+  settingsPanel,
+  settingsHandle,
+  builder,
+  builderHandle,
+  worldgenPanel,
+  worldHandle,
+} from './core/index.js';
 
 function constrainPanel(panel) {
   const rect = panel.getBoundingClientRect();
@@ -65,3 +72,4 @@ function makeDraggable(panel, handle, storageKey) {
 
 makeDraggable(settingsPanel, settingsHandle, 'ui.settings.pos');
 makeDraggable(builder, builderHandle, 'ui.builder.pos');
+makeDraggable(worldgenPanel, worldHandle, 'ui.worldgen.pos');

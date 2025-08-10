@@ -21,7 +21,7 @@ export {
   blockAABBs,
   rebuildAABBs,
 } from './world.js';
-export { updateChunks, worldToChunk } from './procgen.js';
+export { updateChunks, worldToChunk, resetChunks } from './procgen.js';
 export {
   overlay,
   startBtn,
@@ -50,5 +50,9 @@ export {
   sunElevInp,
   sunAziInp,
   sunColorInp,
+  worldgenPanel,
+  worldHandle,
+  seedInp,
+  regenBtn,
 } from './dom.js';
-export { state } from './state.js';
+export { state, setWorldSeed } from './state.js';
