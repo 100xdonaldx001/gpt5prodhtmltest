@@ -18,8 +18,8 @@ const loaded = new Map();
 let PROC_ENABLED = false;
 let CHUNK_SIZE = 32;
 let VIEW_DIST = 5;
-// Precomputed LOD thresholds in chunk units
-let LOD_RANGES = [5, 10, 15, 20];
+// Precomputed LOD thresholds in chunk units with smaller increments
+let LOD_RANGES = [5, 7.5, 10, 12.5];
 
 function key(cx, cz) {
   return cx + ',' + cz;
@@ -98,8 +98,8 @@ function updateChunks(force = false, forcedPos = null) {
   lastChunkUpdate = now;
   CHUNK_SIZE = Math.max(8, parseInt(chunkSizeInp.value) || 32);
   VIEW_DIST = Math.max(1, Math.min(64, parseInt(viewDistInp.value) || 10));
-  // Define four LOD bands expanding the view distance
-  LOD_RANGES = [VIEW_DIST, VIEW_DIST * 2, VIEW_DIST * 3, VIEW_DIST * 4];
+  // Define four LOD bands with smaller incremental steps
+  LOD_RANGES = [VIEW_DIST, VIEW_DIST * 1.5, VIEW_DIST * 2, VIEW_DIST * 2.5];
   // Resize ground to cover the most distant LOD ring
   setGroundSize((LOD_RANGES[3] * 2 + 2) * CHUNK_SIZE);
   // Update collision data for resized terrain

@@ -2,8 +2,8 @@ import { THREE, scene } from '../core/environment.js';
 import { createTerrainMaterial } from '../core/shaders.js';
 import { heightAt } from './heightmap.js';
 
-// Water level for oceans, lakes, and rivers
-let SEA_LEVEL = -10;
+// Water level for oceans, lakes, and rivers (default 130 units)
+let SEA_LEVEL = 130;
 
 // Allow the ground plane to expand as view distance increases
 let groundSize = 800;

@@ -76,7 +76,7 @@ procToggle.addEventListener('click', () => {
 seaLevelInp.addEventListener('change', () => {
   let level = parseFloat(seaLevelInp.value);
   if (!Number.isFinite(level)) {
-    level = -10;
+    level = 130;
     seaLevelInp.value = level;
   }
   setSeaLevel(level);
