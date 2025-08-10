@@ -7,9 +7,14 @@ const SEA_LEVEL = -10;
 
 // Allow the ground plane to expand as view distance increases
 let groundSize = 800;
-const GROUND_SEG = 128;
-let groundGeo = new THREE.PlaneGeometry(groundSize, groundSize, GROUND_SEG, GROUND_SEG);
-groundGeo.rotateX(-Math.PI / 2);
+const GRID_STEP = 8; // spacing between ground vertices
+function createGroundGeo(size) {
+  const seg = Math.max(1, Math.floor(size / GRID_STEP)); // keep detail consistent
+  const geo = new THREE.PlaneGeometry(size, size, seg, seg);
+  geo.rotateX(-Math.PI / 2);
+  return geo;
+}
+let groundGeo = createGroundGeo(groundSize);
 // Shader material snaps vertices to a grid so smooth ground appears voxel-like
 const groundMat = createVoxelTerrainMaterial();
 const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -52,8 +57,7 @@ function setGroundSize(newSize) {
   if (groundSize === newSize) return;
   groundSize = newSize;
   ground.geometry.dispose();
-  groundGeo = new THREE.PlaneGeometry(groundSize, groundSize, GROUND_SEG, GROUND_SEG);
-  groundGeo.rotateX(-Math.PI / 2);
+  groundGeo = createGroundGeo(groundSize); // rebuild with density based on size
   ground.geometry = groundGeo;
   // Resize the water plane to match the new ground size.
   water.geometry.dispose();
