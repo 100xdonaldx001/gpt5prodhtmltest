@@ -21,7 +21,6 @@
   <!-- Settings & Builder panels -->
   <button id="builderToggle" hidden>Builder: On</button>
   <button id="procToggle" hidden>Objects: Off</button>
-  <button id="engineToggle">Use Three.js</button>
 
   <div id="settings" class="panel" hidden>
     <div class="header" id="settingsHandle"><span class="title">Settings</span></div>
@@ -138,9 +137,7 @@
   <div id="time" hidden>00:00</div>
   <div id="warn" hidden>Pointer lock blocked; using drag-to-look (hold mouse to look)</div>
 
-  <canvas id="renderCanvas"></canvas>
-
-  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <!-- Import map so bare specifiers resolve in the browser -->
   <script type="importmap">
   {
     "imports": {
@@ -149,6 +146,7 @@
     }
   }
   </script>
-  <script type="module" src="babylon/js/main.js"></script>
+
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
