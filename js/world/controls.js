@@ -14,11 +14,18 @@ import {
   setTerrainAmps,
   setTerrainType,
   setSeaLevel,
+  setTerrainOptions,
   controls,
   heightAt,
   SEA_LEVEL,
   seaLevelInp,
-  } from '../core/index.js';
+  waterFloorColorInp,
+  grassAInp,
+  grassBInp,
+  stoneColorInp,
+  rockSlopeStartInp,
+  rockSlopeRangeInp,
+} from '../core/index.js';
 
 // Generate a random 32-bit seed.
 function randomSeed() {
@@ -34,6 +41,12 @@ function alignPlayerToGround() {
   if (obj.position.y < groundY) {
     obj.position.y = groundY;
   }
+}
+
+// Apply terrain option changes and rebuild the ground mesh.
+function updateTerrain(opts) {
+  setTerrainOptions(opts);
+  rebuildGround();
 }
 
 // Apply seed and rebuild world when the regenerate button is pressed.
@@ -81,6 +94,46 @@ seaLevelInp.addEventListener('change', () => {
   }
   setSeaLevel(level);
   alignPlayerToGround();
+});
+
+// Update water floor color when the option changes
+waterFloorColorInp.addEventListener('change', () => {
+  updateTerrain({ waterFloorColor: waterFloorColorInp.value });
+});
+
+// Update grass shade A when the option changes
+grassAInp.addEventListener('change', () => {
+  updateTerrain({ grassA: grassAInp.value });
+});
+
+// Update grass shade B when the option changes
+grassBInp.addEventListener('change', () => {
+  updateTerrain({ grassB: grassBInp.value });
+});
+
+// Update stone color when the option changes
+stoneColorInp.addEventListener('change', () => {
+  updateTerrain({ stoneColor: stoneColorInp.value });
+});
+
+// Update slope value where rocks begin to appear
+rockSlopeStartInp.addEventListener('change', () => {
+  let v = parseFloat(rockSlopeStartInp.value);
+  if (!Number.isFinite(v)) {
+    v = 2;
+    rockSlopeStartInp.value = v;
+  }
+  updateTerrain({ rockSlopeStart: v });
+});
+
+// Update additional slope needed to become full rock
+rockSlopeRangeInp.addEventListener('change', () => {
+  let v = parseFloat(rockSlopeRangeInp.value);
+  if (!Number.isFinite(v)) {
+    v = 10;
+    rockSlopeRangeInp.value = v;
+  }
+  updateTerrain({ rockSlopeRange: v });
 });
 
 export { alignPlayerToGround };

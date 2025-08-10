@@ -23,6 +23,8 @@ export {
   rebuildGround,
   setGroundSize,
   setSeaLevel,
+  setTerrainOptions,
+  getTerrainOptions,
 } from '../world/terrain.js';
 export {
   grid,
@@ -72,6 +74,12 @@ export {
   mountainAmpInp,
   valleyAmpInp,
   terrainTypeSel,
+  waterFloorColorInp,
+  grassAInp,
+  grassBInp,
+  stoneColorInp,
+  rockSlopeStartInp,
+  rockSlopeRangeInp,
   debugPanel,
   debugHandle,
   dbgTests,

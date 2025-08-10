@@ -36,6 +36,12 @@ const regenBtn = document.getElementById('regen');
 const mountainAmpInp = document.getElementById('mountainAmp');
 const valleyAmpInp = document.getElementById('valleyAmp');
 const terrainTypeSel = document.getElementById('terrainType');
+const waterFloorColorInp = document.getElementById('waterFloorColor');
+const grassAInp = document.getElementById('grassA');
+const grassBInp = document.getElementById('grassB');
+const stoneColorInp = document.getElementById('stoneColor');
+const rockSlopeStartInp = document.getElementById('rockSlopeStart');
+const rockSlopeRangeInp = document.getElementById('rockSlopeRange');
 
 const debugPanel = document.getElementById('debug');
 const debugHandle = document.getElementById('debugHandle');
@@ -80,6 +86,12 @@ export {
   mountainAmpInp,
   valleyAmpInp,
   terrainTypeSel,
+  waterFloorColorInp,
+  grassAInp,
+  grassBInp,
+  stoneColorInp,
+  rockSlopeStartInp,
+  rockSlopeRangeInp,
   debugPanel,
   debugHandle,
   dbgTests,
