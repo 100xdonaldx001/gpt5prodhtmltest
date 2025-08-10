@@ -36,6 +36,7 @@ let last = performance.now(), frames = 0, acc = 0;
 const clock = new THREE.Clock();
 const downRay = new THREE.Raycaster(); // Used to detect ground beneath the player
 function approach(cur, target, maxStep) {
+  // Move the current value toward the target without exceeding maxStep
   if (cur < target) return Math.min(target, cur + maxStep);
   if (cur > target) return Math.max(target, cur - maxStep);
   return cur;
@@ -75,19 +76,28 @@ function animate() {
     const speed = movement.walk * (move.run ? movement.runMul : 1);
     const accel = speed * 20;
     const maxStep = accel * delta;
-    const targetF = sF * speed;
-    const targetR = sR * speed;
-    movement.vForward = approach(movement.vForward, targetF, maxStep);
-    movement.vRight = approach(movement.vRight, targetR, maxStep);
-    const damping = Math.max(0.8, 1 - 8 * delta);
-    if (sF === 0) movement.vForward *= damping;
-    if (sR === 0) movement.vRight *= damping;
-    movement.vY -= movement.gravity * delta;
+    // Object representing the player's camera
     const obj = controls.getObject();
+    const yaw = obj.rotation.y;
+    // Forward and right vectors in world space
+    const dirF = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
+    const dirR = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
+    // Target velocities based on input
+    const targetVelX = (dirF.x * sF + dirR.x * sR) * speed;
+    const targetVelZ = (dirF.z * sF + dirR.z * sR) * speed;
+    movement.vel.x = approach(movement.vel.x, targetVelX, maxStep);
+    movement.vel.z = approach(movement.vel.z, targetVelZ, maxStep);
+    const damping = Math.max(0.8, 1 - 8 * delta);
+    if (sF === 0 && sR === 0) {
+      movement.vel.x *= damping;
+      movement.vel.z *= damping;
+    }
+    movement.vel.y -= movement.gravity * delta;
     const prevY = obj.position.y;
     const prevFeetY = prevY - movement.playerHeight;
     const prevHeadY = prevY;
-    obj.position.y += movement.vY * delta;
+    // Move vertically first to handle gravity
+    obj.position.y += movement.vel.y * delta;
     resolveVerticalCollisions(prevFeetY, prevHeadY, obj.position);
     // Cast a ray downward to keep the player grounded
     const downOrigin = obj.position.clone();
@@ -99,26 +109,24 @@ function animate() {
       const d = hits[0].distance;
       if (d < minDist) {
         obj.position.y += minDist - d;
-        movement.vY = 0;
+        movement.vel.y = 0;
         movement.canJump = true;
       }
     }
     if (obj.position.y < -20) {
       obj.position.set(0, movement.playerHeight + 1, 0);
-      movement.vForward = movement.vRight = movement.vY = 0;
+      movement.vel.x = movement.vel.y = movement.vel.z = 0;
     }
-    controls.moveForward(movement.vForward * delta);
-    controls.moveRight(movement.vRight * delta);
+    // Apply horizontal velocity
+    obj.position.x += movement.vel.x * delta;
+    obj.position.z += movement.vel.z * delta;
     const feetY = obj.position.y - movement.playerHeight;
     const headY = obj.position.y;
     const collided = resolveHorizontalCollisions(obj.position, feetY, headY);
     if (collided) {
       attemptStepUp(obj);
     } else {
-      const yaw = obj.rotation.y;
-      const forward = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw)).multiplyScalar(movement.vForward);
-      const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw)).multiplyScalar(movement.vRight);
-      const dirWorld = forward.clone().add(right);
+      const dirWorld = new THREE.Vector3(movement.vel.x, 0, movement.vel.z);
       attemptStepUpProbe(obj, dirWorld);
     }
     if (maybeRecenterGround(obj.position.x, obj.position.z)) rebuildAABBs();

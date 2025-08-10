@@ -20,11 +20,13 @@ function resolveHorizontalCollisions(pos3, feetY, headY) {
     if (pushX < pushZ) {
       if (dxLeft < dxRight) pos3.x = minX;
       else pos3.x = maxX;
-      movement.vRight = 0;
+      // Stop horizontal movement along the X axis
+      movement.vel.x = 0;
     } else {
       if (dzNear < dzFar) pos3.z = minZ;
       else pos3.z = maxZ;
-      movement.vForward = 0;
+      // Stop horizontal movement along the Z axis
+      movement.vel.z = 0;
     }
     collided = true;
   }
@@ -66,7 +68,7 @@ function attemptStepUp(obj) {
   obj.position.y = tryY;
   const ok = !hasHorizontalOverlap(obj.position, tryY - movement.playerHeight, tryY);
   if (ok) {
-    movement.vY = 0;
+    movement.vel.y = 0;
     movement.canJump = true;
     return true;
   }
@@ -98,7 +100,7 @@ function attemptStepUpProbe(obj, dirWorld) {
   obj.position.y = tryY;
   const ok = !hasHorizontalOverlap(obj.position, tryY - movement.playerHeight, tryY);
   if (ok) {
-    movement.vY = 0;
+    movement.vel.y = 0;
     movement.canJump = true;
     return true;
   }
@@ -115,14 +117,14 @@ function resolveVerticalCollisions(prevFeetY, prevHeadY, pos3) {
     if (pos3.x < minX || pos3.x > maxX || pos3.z < minZ || pos3.z > maxZ) continue;
     const feetY = pos3.y - movement.playerHeight;
     const headY = pos3.y;
-    if (movement.vY > 0 && prevHeadY <= box.min.y && headY > box.min.y) {
+    if (movement.vel.y > 0 && prevHeadY <= box.min.y && headY > box.min.y) {
       pos3.y = box.min.y - movement.playerHeight;
-      movement.vY = 0;
+      movement.vel.y = 0;
       movement.canJump = false;
     }
-    if (movement.vY < 0 && prevFeetY >= box.max.y && feetY < box.max.y) {
+    if (movement.vel.y < 0 && prevFeetY >= box.max.y && feetY < box.max.y) {
       pos3.y = box.max.y + movement.playerHeight;
-      movement.vY = 0;
+      movement.vel.y = 0;
       movement.canJump = true;
     }
   }
