@@ -67,9 +67,17 @@ function maybeRecenterGround(playerX, playerZ) {
   const dx = playerX - groundCenter.x;
   const dz = playerZ - groundCenter.y;
   const threshold = groundSize * 0.25;
-  if (Math.abs(dx) > threshold || Math.abs(dz) > threshold) {
-    groundCenter.x = Math.round(playerX / (groundSize * 0.25)) * (groundSize * 0.25);
-    groundCenter.y = Math.round(playerZ / (groundSize * 0.25)) * (groundSize * 0.25);
+  let shifted = false;
+  // Shift the terrain origin in fixed increments to avoid large jumps.
+  if (Math.abs(dx) > threshold) {
+    groundCenter.x += Math.sign(dx) * threshold;
+    shifted = true;
+  }
+  if (Math.abs(dz) > threshold) {
+    groundCenter.y += Math.sign(dz) * threshold;
+    shifted = true;
+  }
+  if (shifted) {
     rebuildGround();
     // Signal that the terrain was recentered so callers can update collisions.
     return true;
