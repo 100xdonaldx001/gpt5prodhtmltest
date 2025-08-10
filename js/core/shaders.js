@@ -23,7 +23,8 @@ function createBlockMaterial(color) {
 
 // Create a standard material for smooth terrain
 function createTerrainMaterial() {
-  return new THREE.MeshStandardMaterial({ color: 0x35506e, roughness: 0.95 });
+  // Allow per-vertex colors so ground can show varied terrain shades
+  return new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95 });
 }
 
 export { createBlockMaterial, createTerrainMaterial };
