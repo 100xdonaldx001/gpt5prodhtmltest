@@ -8,7 +8,8 @@ let groundGeo = new THREE.PlaneGeometry(groundSize, groundSize, GROUND_SEG, GROU
 groundGeo.rotateX(-Math.PI / 2);
 const groundMat = new THREE.MeshStandardMaterial({ color: 0x35506e, roughness: 0.95 });
 const ground = new THREE.Mesh(groundGeo, groundMat);
-ground.receiveShadow = true;
+// Allow terrain to cast shadows on itself so mountains block light.
+ground.castShadow = ground.receiveShadow = true;
 scene.add(ground);
 
 // Pseudo-random generator producing deterministic values for terrain.
@@ -101,10 +102,10 @@ function rebuildGround() {
 }
 rebuildGround();
 
-// Expand ground size to cover the specified area
-function ensureGroundSize(minSize) {
-  if (groundSize >= minSize) return;
-  groundSize = minSize;
+// Resize ground mesh when view distance or chunk size changes
+function setGroundSize(newSize) {
+  if (groundSize === newSize) return;
+  groundSize = newSize;
   ground.geometry.dispose();
   groundGeo = new THREE.PlaneGeometry(groundSize, groundSize, GROUND_SEG, GROUND_SEG);
   groundGeo.rotateX(-Math.PI / 2);
@@ -123,4 +124,4 @@ function maybeRecenterGround(playerX, playerZ) {
   }
 }
 
-export { ground, heightAt, maybeRecenterGround, rebuildGround, ensureGroundSize };
+export { ground, heightAt, maybeRecenterGround, rebuildGround, setGroundSize };
