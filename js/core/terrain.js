@@ -1,9 +1,10 @@
 import { THREE, scene } from './environment.js';
 import { state } from './state.js';
 
-const GROUND_SIZE = 800;
+// Allow the ground plane to expand as view distance increases
+let groundSize = 800;
 const GROUND_SEG = 128;
-const groundGeo = new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE, GROUND_SEG, GROUND_SEG);
+let groundGeo = new THREE.PlaneGeometry(groundSize, groundSize, GROUND_SEG, GROUND_SEG);
 groundGeo.rotateX(-Math.PI / 2);
 const groundMat = new THREE.MeshStandardMaterial({ color: 0x35506e, roughness: 0.95 });
 const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -99,15 +100,26 @@ function rebuildGround() {
 }
 rebuildGround();
 
+// Expand ground size to cover the specified area
+function ensureGroundSize(minSize) {
+  if (groundSize >= minSize) return;
+  groundSize = minSize;
+  ground.geometry.dispose();
+  groundGeo = new THREE.PlaneGeometry(groundSize, groundSize, GROUND_SEG, GROUND_SEG);
+  groundGeo.rotateX(-Math.PI / 2);
+  ground.geometry = groundGeo;
+  rebuildGround();
+}
+
 function maybeRecenterGround(playerX, playerZ) {
   const dx = playerX - groundCenter.x;
   const dz = playerZ - groundCenter.y;
-  const threshold = GROUND_SIZE * 0.25;
+  const threshold = groundSize * 0.25;
   if (Math.abs(dx) > threshold || Math.abs(dz) > threshold) {
-    groundCenter.x = Math.round(playerX / (GROUND_SIZE * 0.25)) * (GROUND_SIZE * 0.25);
-    groundCenter.y = Math.round(playerZ / (GROUND_SIZE * 0.25)) * (GROUND_SIZE * 0.25);
+    groundCenter.x = Math.round(playerX / (groundSize * 0.25)) * (groundSize * 0.25);
+    groundCenter.y = Math.round(playerZ / (groundSize * 0.25)) * (groundSize * 0.25);
     rebuildGround();
   }
 }
 
-export { ground, heightAt, maybeRecenterGround, rebuildGround };
+export { ground, heightAt, maybeRecenterGround, rebuildGround, ensureGroundSize };
