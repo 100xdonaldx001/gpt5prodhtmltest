@@ -42,6 +42,7 @@ export {
   syInp,
   szInp,
   spawnBtn,
+  clearBtn,
   speedInp,
   runMulInp,
   jumpInp,
