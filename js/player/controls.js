@@ -18,6 +18,7 @@ import {
   worldgenPanel,
   state,
   debugPanel,
+  alignPlayerToGround,
   } from '../core/index.js';
   import { updatePreview } from '../builder/preview.js';
 
@@ -130,6 +131,7 @@ controls.addEventListener('lock', () => {
   mouseEnabled = false;
   state.mouseEnabled = false;
   showUI(true);
+  alignPlayerToGround();
   updatePreview();
 });
 controls.addEventListener('unlock', () => {

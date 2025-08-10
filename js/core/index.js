@@ -14,7 +14,16 @@ export {
   sky,
   updateEnvironment,
 } from './environment.js';
-export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize } from '../world/terrain.js';
+export {
+  ground,
+  water,
+  SEA_LEVEL,
+  heightAt,
+  maybeRecenterGround,
+  rebuildGround,
+  setGroundSize,
+  setSeaLevel,
+} from '../world/terrain.js';
 export {
   grid,
   blocks,
@@ -55,6 +64,7 @@ export {
   stepHInp,
   viewDistInp,
   chunkSizeInp,
+  seaLevelInp,
   worldgenPanel,
   worldHandle,
   seedInp,
@@ -69,3 +79,4 @@ export {
   dbgGround,
 } from './dom.js';
 export { state, setWorldSeed, setTerrainAmps, setTerrainType } from './state.js';
+export { alignPlayerToGround } from '../world/controls.js';
