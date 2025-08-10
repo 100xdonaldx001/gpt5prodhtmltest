@@ -161,18 +161,59 @@ function fbm3D(x, y, z) {
   return total / max;
 }
 
-// Compute base terrain height from 2D noise
-function baseHeight(x, z) {
+// Step 1: base terrain of hills and valleys
+function hillValleyHeight(x, z) {
   const n = fbm2D(x * 0.01, z * 0.01);
   const mountain = Math.pow(Math.max(0, n), 3) * state.mountainAmp;
   const valley = -Math.pow(Math.max(0, -n), 2) * state.valleyAmp;
+  return mountain + valley;
+}
+
+// Step 2: carve rivers using low frequency noise
+function riverDepth(x, z) {
   const r = Math.abs(noise2D(x * 0.0008, z * 0.0008));
-  const river = Math.max(0, 0.02 - r) * 100;
-  return mountain + valley - river - 5;
+  return Math.max(0, 0.02 - r) * 100;
+}
+
+// Step 3: lay down roads similar to rivers but shallower
+function roadDepth(x, z) {
+  const r = Math.abs(noise2D((x + 1000) * 0.0009, (z - 1000) * 0.0009));
+  return Math.max(0, 0.01 - r) * 50;
+}
+
+// Combine all terrain steps into a single height value
+function baseHeight(x, z) {
+  return hillValleyHeight(x, z) - riverDepth(x, z) - roadDepth(x, z) - 5;
+}
+
+// Determine what surface feature exists at a coordinate
+function featureAt(x, z) {
+  if (roadDepth(x, z) > 0) return 'road';
+  if (riverDepth(x, z) > 0) return 'river';
+  return 'ground';
+}
+
+// Pick a color for a voxel based on its feature with slight variation
+function blockColor(x, y, z, feature) {
+  const rand = mulberry32(state.worldSeed ^ (x * 73856093) ^ (y * 19349663) ^ (z * 83492791))();
+  const base = new THREE.Color();
+  if (feature === 'road') {
+    base.set(0xbfa27a); // light brown road
+  } else if (feature === 'river') {
+    base.set(0x6d7f8a); // stone grey with blue hint
+  } else {
+    base.set(0x3a9f40); // grassy green ground
+  }
+  const hsl = {};
+  base.getHSL(hsl);
+  hsl.l = Math.min(1, Math.max(0, hsl.l + (rand - 0.5) * 0.2));
+  base.setHSL(hsl.h, hsl.s, hsl.l);
+  return base.getHex();
 }
 
 // Density field that determines whether a voxel is solid
 function densityAt(x, y, z) {
+  // Overhangs and caves come from 3D noise added after roads and rivers
   const h = baseHeight(x, z);
   const cave = fbm3D(x * 0.02, y * 0.02, z * 0.02) * 15;
   return h + cave - y;
@@ -208,7 +249,9 @@ function rebuildGround() {
         const wy = y;
         const wz = groundCenter.y + z;
         if (densityAt(wx, wy, wz) > 0) {
-          const mat = createBlockMaterial(0x35506e);
+          const feature = featureAt(wx, wz);
+          const color = blockColor(wx, wy, wz, feature);
+          const mat = createBlockMaterial(color);
           const cube = new THREE.Mesh(new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE), mat);
           cube.position.set(wx + VOXEL_SIZE / 2, wy + VOXEL_SIZE / 2, wz + VOXEL_SIZE / 2);
           cube.castShadow = cube.receiveShadow = true;
