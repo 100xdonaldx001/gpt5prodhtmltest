@@ -11,10 +11,12 @@ import {
   syInp,
   szInp,
   spawnBtn,
+  clearBtn,
   ground,
   blocks,
   userGroup,
   blockAABBs,
+  rebuildAABBs,
   state,
 } from './core/index.js';
 
@@ -131,9 +133,16 @@ function spawnAtPreview() {
   addAABBForMesh(mesh);
 }
 
+// Remove all user-placed blocks and refresh collision boxes.
+function clearUserBlocks() {
+  userGroup.clear();
+  rebuildAABBs();
+}
+
 shapeSel.addEventListener('change', updatePreview);
 [sxInp, syInp, szInp].forEach((el) => el.addEventListener('input', updatePreview));
 spawnBtn.addEventListener('click', spawnAtPreview);
+clearBtn.addEventListener('click', clearUserBlocks);
 window.addEventListener('keydown', (e) => {
   if (e.code === 'Enter' && state.isActive) spawnAtPreview();
 });

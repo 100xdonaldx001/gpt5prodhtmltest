@@ -17,6 +17,7 @@ const sxInp = document.getElementById('sx');
 const syInp = document.getElementById('sy');
 const szInp = document.getElementById('sz');
 const spawnBtn = document.getElementById('spawn');
+const clearBtn = document.getElementById('clearBlocks');
 const speedInp = document.getElementById('speed');
 const runMulInp = document.getElementById('runmul');
 const jumpInp = document.getElementById('jump');
@@ -51,6 +52,7 @@ export {
   syInp,
   szInp,
   spawnBtn,
+  clearBtn,
   speedInp,
   runMulInp,
   jumpInp,
