@@ -125,7 +125,8 @@ function animate() {
       const dirWorld = forward.multiplyScalar(movement.vForward).add(right.multiplyScalar(movement.vRight));
       attemptStepUpProbe(obj, dirWorld);
     }
-    if (maybeRecenterGround(obj.position.x, obj.position.z)) rebuildAABBs();
+    const recenter = maybeRecenterGround(obj.position.x, obj.position.z);
+    if (recenter.shifted) rebuildAABBs();
     const dist = 100;
     sunLight.position.set(
       obj.position.x + sunDir.x * dist,

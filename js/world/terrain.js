@@ -64,26 +64,25 @@ function setGroundSize(newSize) {
 }
 
 function maybeRecenterGround(playerX, playerZ) {
-  // Rebuild ground and water meshes when the player wanders too far.
+  // Determine whether the terrain origin needs to shift to keep
+  // coordinates near the player and avoid precision issues.
   const dx = playerX - groundCenter.x;
   const dz = playerZ - groundCenter.y;
-  const threshold = groundSize * 0.25;
-  let shifted = false;
-  // Shift the terrain origin in fixed steps to minimize visible jumps.
-  if (Math.abs(dx) > threshold) {
-    groundCenter.x += Math.sign(dx) * threshold;
-    shifted = true;
-  }
-  if (Math.abs(dz) > threshold) {
-    groundCenter.y += Math.sign(dz) * threshold;
-    shifted = true;
-  }
-  if (shifted) {
+  const threshold = groundSize * 0.1;
+  let shiftX = 0;
+  let shiftZ = 0;
+  // Move the terrain in fixed increments when the player strays too far.
+  if (Math.abs(dx) > threshold) shiftX = Math.sign(dx) * threshold;
+  if (Math.abs(dz) > threshold) shiftZ = Math.sign(dz) * threshold;
+  if (shiftX || shiftZ) {
+    groundCenter.x += shiftX;
+    groundCenter.y += shiftZ;
     rebuildGround();
-    return true; // Signal that terrain was recentered
+    // Return the applied shift so other world elements can follow.
+    return { shifted: true, dx: shiftX, dz: shiftZ };
   }
-  // No recentering needed this frame.
-  return false;
+  // No recentering needed; report zero shift.
+  return { shifted: false, dx: 0, dz: 0 };
 }
 
 export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize };
