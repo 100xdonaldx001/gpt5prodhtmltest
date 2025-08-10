@@ -15,8 +15,8 @@ import {
   procToggle,
   worldgenPanel,
   state,
-} from '../core/index.js';
-import { updatePreview } from '../builder.js';
+  } from '../core/index.js';
+  import { updatePreview } from '../builder/preview.js';
 
 let fallbackActive = state.fallbackActive;
 let mouseEnabled = state.mouseEnabled;

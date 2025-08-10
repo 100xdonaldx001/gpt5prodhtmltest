@@ -11,7 +11,7 @@ export {
   sunDir,
   sky,
 } from './environment.js';
-export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize } from './terrain.js';
+export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize } from '../world/terrain.js';
 export {
   grid,
   blocks,
@@ -21,8 +21,8 @@ export {
   addBlockTo,
   blockAABBs,
   rebuildAABBs,
-} from './world.js';
-export { updateChunks, worldToChunk, resetChunks, toggleProcgen } from './procgen.js';
+} from '../world/world.js';
+export { updateChunks, worldToChunk, resetChunks, toggleProcgen } from '../world/procgen.js';
 export {
   overlay,
   startBtn,

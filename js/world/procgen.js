@@ -1,7 +1,7 @@
-import { THREE, controls } from './environment.js';
+import { THREE, controls } from '../core/environment.js';
 import { chunksGroup, addBlockTo, rebuildAABBs } from './world.js';
-import { chunkSizeInp, viewDistInp } from './dom.js';
-import { state } from './state.js';
+import { chunkSizeInp, viewDistInp } from '../core/dom.js';
+import { state } from '../core/state.js';
 import { setGroundSize, heightAt, SEA_LEVEL } from './terrain.js';
 
 function mulberry32(a) {

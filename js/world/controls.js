@@ -14,7 +14,7 @@ import {
   controls,
   heightAt,
   SEA_LEVEL,
-} from './core/index.js';
+  } from '../core/index.js';
 
 // Generate a random 32-bit seed.
 function randomSeed() {

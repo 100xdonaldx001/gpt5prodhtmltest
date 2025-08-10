@@ -1,2 +1,2 @@
 import './controls.js';
-import './movement.js';
+import './movement/index.js';

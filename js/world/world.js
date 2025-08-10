@@ -1,6 +1,6 @@
-import { THREE, scene } from './environment.js';
+import { THREE, scene } from '../core/environment.js';
 import { ground } from './terrain.js';
-import { createBlockMaterial } from './shaders.js';
+import { createBlockMaterial } from '../core/shaders.js';
 
 const grid = new THREE.GridHelper(400, 80, 0x7aa2ff, 0x2b3d55);
 grid.material.opacity = 0.25;
