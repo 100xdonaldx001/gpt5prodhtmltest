@@ -31,9 +31,8 @@ function setBuilderVisible(visible) {
 export function toggleBuilder() {
   setBuilderVisible(builder.hidden);
 }
-builderToggle.addEventListener('click', toggleBuilder);
-// Hide builder panel on load so it doesn't appear before the user toggles it.
-setBuilderVisible(false);
+builderToggle.addEventListener('click', () => toggleBuilder());
+setBuilderVisible(true);
 
 function addAABBForMesh(mesh) {
   mesh.updateMatrixWorld(true);

@@ -26,8 +26,7 @@ function onKeyDown(e) {
       break;
     case 'Space':
       if (movement.canJump && state.isActive) {
-        // Apply upward velocity when jumping
-        movement.vel.y = movement.jumpStrength;
+        movement.vY = movement.jumpStrength;
         movement.canJump = false;
       }
       break;

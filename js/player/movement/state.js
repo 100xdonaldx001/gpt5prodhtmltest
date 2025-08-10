@@ -8,8 +8,9 @@ const movement = {
   stepHeight: 1,
   playerHeight: 1.75,
   playerRadius: 0.45,
-  // Player velocity in world units per second
-  vel: { x: 0, y: 0, z: 0 },
+  vForward: 0,
+  vRight: 0,
+  vY: 0,
   lastElev: 22,
   lastAzi: 140,
   lastColor: '#ffffff',
