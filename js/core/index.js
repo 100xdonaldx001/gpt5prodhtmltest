@@ -37,6 +37,7 @@ export {
   rebuildAABBs,
 } from '../world/world.js';
 export { updateChunks, worldToChunk, resetChunks, toggleProcgen } from '../world/procgen.js';
+export { updateTerrainChunks, updateHeightTexture, populateVegetation, finalizeStatic } from '../world/chunkedTerrain.js';
 export {
   overlay,
   startBtn,
