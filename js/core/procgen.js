@@ -1,7 +1,6 @@
 import { THREE, controls } from './environment.js';
 import { chunksGroup, addBlockTo, rebuildAABBs } from './world.js';
 import { chunkSizeInp, viewDistInp } from './dom.js';
-import { state } from './state.js';
 
 function mulberry32(a) {
   return function () {
@@ -27,7 +26,7 @@ function worldToChunk(x, z) {
 function generateChunk(cx, cz) {
   const g = new THREE.Group();
   g.userData.type = 'chunk';
-  const seed = state.worldSeed ^ (cx * 73856093) ^ (cz * 19349663);
+  const seed = cx * 73856093 ^ (cz * 19349663);
   const rand = mulberry32(seed >>> 0);
   const count = 12 + Math.floor(rand() * 10);
   for (let i = 0; i < count; i++) {
@@ -68,14 +67,6 @@ function unloadChunk(cx, cz) {
   loaded.delete(k);
 }
 
-// Remove all loaded chunks so a new seed can regenerate the world.
-function resetChunks() {
-  for (const k of Array.from(loaded.keys())) {
-    const [cx, cz] = k.split(',').map(Number);
-    unloadChunk(cx, cz);
-  }
-}
-
 let lastChunkUpdate = 0;
 function updateChunks(force = false, forcedPos = null) {
   if (!PROC_ENABLED) return;
@@ -113,4 +104,4 @@ function updateChunks(force = false, forcedPos = null) {
 window.__forceChunkUpdate = (x, z) => updateChunks(true, new THREE.Vector3(x, 0, z));
 updateChunks(true, new THREE.Vector3(0, 0, 0));
 
-export { updateChunks, worldToChunk, resetChunks };
+export { updateChunks, worldToChunk };
