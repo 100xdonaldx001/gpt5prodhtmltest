@@ -2,7 +2,7 @@ import { THREE, scene } from './environment.js';
 import { state } from './state.js';
 
 // Water level for oceans, lakes, and rivers
-const SEA_LEVEL = 0;
+const SEA_LEVEL = -10;
 
 // Allow the ground plane to expand as view distance increases
 let groundSize = 800;
@@ -90,7 +90,8 @@ function fbm2D(x, z) {
 
 // Height map producing smooth ground with mountains, valleys, and rivers.
 function heightAt(x, z) {
-  const n = fbm2D(x * 0.005, z * 0.005);
+  // Increase noise frequency so mountains are packed closer together.
+  const n = fbm2D(x * 0.01, z * 0.01);
   // Amplify heights using configurable mountain and valley factors.
   const mountain = Math.pow(Math.max(0, n), 3) * state.mountainAmp;
   const valley = -Math.pow(Math.max(0, -n), 2) * state.valleyAmp;
