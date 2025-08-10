@@ -1,6 +1,9 @@
 import { THREE, scene } from './environment.js';
 import { state } from './state.js';
 
+// Water level for oceans, lakes, and rivers
+const SEA_LEVEL = 0;
+
 // Allow the ground plane to expand as view distance increases
 let groundSize = 800;
 const GROUND_SEG = 128;
@@ -10,7 +13,17 @@ const groundMat = new THREE.MeshStandardMaterial({ color: 0x35506e, roughness: 0
 const ground = new THREE.Mesh(groundGeo, groundMat);
 // Allow terrain to cast shadows on itself so mountains block light.
 ground.castShadow = ground.receiveShadow = true;
+
+// Flat water plane that fills low-lying terrain
+let waterGeo = new THREE.PlaneGeometry(groundSize, groundSize, 1, 1);
+waterGeo.rotateX(-Math.PI / 2);
+const waterMat = new THREE.MeshStandardMaterial({ color: 0x1e90ff, transparent: true, opacity: 0.6 });
+const water = new THREE.Mesh(waterGeo, waterMat);
+// Let water reflect light but not cast shadows
+water.receiveShadow = true;
+
 scene.add(ground);
+scene.add(water);
 
 // Pseudo-random generator producing deterministic values for terrain.
 function mulberry32(a) {
@@ -75,13 +88,17 @@ function fbm2D(x, z) {
   return total / max;
 }
 
-// Height map producing smooth ground with taller mountains.
+// Height map producing smooth ground with mountains, valleys, and rivers.
 function heightAt(x, z) {
   const n = fbm2D(x * 0.005, z * 0.005);
   // Amplify heights using configurable mountain and valley factors.
   const mountain = Math.pow(Math.max(0, n), 3) * state.mountainAmp;
   const valley = -Math.pow(Math.max(0, -n), 2) * state.valleyAmp;
-  return mountain + valley;
+  // Carve rivers with low-frequency noise. Values near zero become riverbeds.
+  const r = Math.abs(noise2D(x * 0.0008, z * 0.0008));
+  const river = Math.max(0, 0.02 - r) * 100;
+  // Lower overall height to form oceans and lakes at sea level.
+  return mountain + valley - river - 5;
 }
 
 let groundCenter = new THREE.Vector2(0, 0);
@@ -99,6 +116,8 @@ function rebuildGround() {
   pos.needsUpdate = true;
   groundGeo.computeVertexNormals();
   ground.position.set(groundCenter.x, 0, groundCenter.y);
+  // Recenter water plane so rivers and oceans follow the terrain.
+  water.position.set(groundCenter.x, SEA_LEVEL, groundCenter.y);
 }
 rebuildGround();
 
@@ -110,6 +129,11 @@ function setGroundSize(newSize) {
   groundGeo = new THREE.PlaneGeometry(groundSize, groundSize, GROUND_SEG, GROUND_SEG);
   groundGeo.rotateX(-Math.PI / 2);
   ground.geometry = groundGeo;
+  // Resize the water plane to match the new ground size.
+  water.geometry.dispose();
+  waterGeo = new THREE.PlaneGeometry(groundSize, groundSize, 1, 1);
+  waterGeo.rotateX(-Math.PI / 2);
+  water.geometry = waterGeo;
   rebuildGround();
 }
 
@@ -124,4 +148,4 @@ function maybeRecenterGround(playerX, playerZ) {
   }
 }
 
-export { ground, heightAt, maybeRecenterGround, rebuildGround, setGroundSize };
+export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize };
