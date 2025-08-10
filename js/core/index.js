@@ -9,6 +9,7 @@ export {
   setSun,
   sunLight,
   sunDir,
+  sky,
 } from './environment.js';
 export { ground, heightAt, maybeRecenterGround, rebuildGround } from './terrain.js';
 export {
