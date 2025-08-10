@@ -24,6 +24,9 @@ import {
   stepHInp,
   state,
   updateChunks,
+  updateTerrainChunks,
+  updateHeightTexture,
+  populateVegetation,
   maybeRecenterGround,
   rebuildAABBs,
   updateEnvironment,
@@ -77,6 +80,8 @@ function animate() {
   updateEnvironment(sunElev);
   updateTimeDisplay();
   updateChunks();
+  updateTerrainChunks();
+  updateHeightTexture(new THREE.Vector2(camera.position.x, camera.position.z));
   // Only update player motion when enabled in the debug menu.
   if (state.isActive && (!window.__DEBUG || window.__DEBUG.movement)) {
     const sF = (move.forward ? 1 : 0) - (move.back ? 1 : 0);
@@ -162,6 +167,7 @@ function animate() {
   }
   renderer.render(scene, camera);
 }
+populateVegetation();
 animate();
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
