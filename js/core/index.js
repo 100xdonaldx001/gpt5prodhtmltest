@@ -58,7 +58,6 @@ export {
   sunElevInp,
   sunAziInp,
   sunColorInp,
-  moonStrengthInp,
   worldgenPanel,
   worldHandle,
   seedInp,

@@ -22,7 +22,6 @@ import {
   runMulInp,
   jumpInp,
   stepHInp,
-  moonStrengthInp,
   state,
   updateChunks,
   maybeRecenterGround,
@@ -144,9 +143,7 @@ function animate() {
     );
     sunLight.target.position.copy(obj.position);
     sunLight.target.updateMatrixWorld();
-    // Position the moon opposite the sun and apply user-defined strength
-    const moonStrength = parseFloat(moonStrengthInp.value);
-    moonLight.intensity = Number.isFinite(moonStrength) ? moonStrength : 0.2;
+    // Position the moon opposite the sun; intensity remains fixed
     moonLight.position.set(
       obj.position.x - sunDir.x * dist,
       obj.position.y - sunDir.y * dist,

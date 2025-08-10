@@ -30,7 +30,6 @@ const chunkSizeInp = document.getElementById('chunkSize');
 const sunElevInp = document.getElementById('sunElev');
 const sunAziInp = document.getElementById('sunAzi');
 const sunColorInp = document.getElementById('sunColor');
-const moonStrengthInp = document.getElementById('moonStrength');
 
 const worldgenPanel = document.getElementById('worldgen');
 const worldHandle = document.getElementById('worldHandle');
@@ -77,7 +76,6 @@ export {
   sunElevInp,
   sunAziInp,
   sunColorInp,
-  moonStrengthInp,
   worldgenPanel,
   worldHandle,
   seedInp,

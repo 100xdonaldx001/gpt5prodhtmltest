@@ -81,8 +81,8 @@ sunLight.shadow.camera.top = shadowRange;
 sunLight.shadow.camera.bottom = -shadowRange;
 scene.add(sunLight);
 
-// Add a moon light opposite the sun
-const moonLight = new THREE.DirectionalLight(0xffffff, 0.2);
+// Add a moon light opposite the sun with lower intensity to prevent glare
+const moonLight = new THREE.DirectionalLight(0xffffff, 0.04);
 // Let the moon light cast shadows like the sun
 moonLight.castShadow = true;
 moonLight.shadow.mapSize.set(2048, 2048);
