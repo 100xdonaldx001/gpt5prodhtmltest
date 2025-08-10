@@ -7,6 +7,7 @@ import {
   setSun,
   sunLight,
   sunDir,
+  sky,
   ground,
   blocks,
   fpsBox,
@@ -345,6 +346,8 @@ function animate() {
     );
     sunLight.target.position.copy(obj.position);
     sunLight.target.updateMatrixWorld();
+    // Keep skybox centered on the player
+    sky.position.copy(obj.position);
   }
 
   renderer.render(scene, camera);

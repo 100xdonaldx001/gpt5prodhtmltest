@@ -70,4 +70,5 @@ export {
   setSun,
   sunLight,
   sunDir,
+  sky,
 };
