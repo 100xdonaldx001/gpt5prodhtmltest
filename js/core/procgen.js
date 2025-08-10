@@ -14,7 +14,8 @@ function mulberry32(a) {
 }
 
 const loaded = new Map();
-let PROC_ENABLED = true;
+// Disable procedural object generation by default
+let PROC_ENABLED = false;
 let CHUNK_SIZE = 32;
 let VIEW_DIST = 5;
 
@@ -116,4 +117,15 @@ function updateChunks(force = false, forcedPos = null) {
 window.__forceChunkUpdate = (x, z) => updateChunks(true, new THREE.Vector3(x, 0, z));
 updateChunks(true, new THREE.Vector3(0, 0, 0));
 
-export { updateChunks, worldToChunk, resetChunks };
+function toggleProcgen() {
+  // Toggle procedural generation and rebuild or clear chunks
+  PROC_ENABLED = !PROC_ENABLED;
+  if (!PROC_ENABLED) {
+    resetChunks();
+  } else {
+    updateChunks(true);
+  }
+  return PROC_ENABLED;
+}
+
+export { updateChunks, worldToChunk, resetChunks, toggleProcgen };

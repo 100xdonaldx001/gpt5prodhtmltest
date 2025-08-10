@@ -11,6 +11,7 @@ const settingsHandle = document.getElementById('settingsHandle');
 const builder = document.getElementById('builder');
 const builderHandle = document.getElementById('builderHandle');
 const builderToggle = document.getElementById('builderToggle');
+const procToggle = document.getElementById('procToggle');
 const shapeSel = document.getElementById('shape');
 const colorInp = document.getElementById('color');
 const sxInp = document.getElementById('sx');
@@ -48,6 +49,7 @@ export {
   builder,
   builderHandle,
   builderToggle,
+  procToggle,
   shapeSel,
   colorInp,
   sxInp,

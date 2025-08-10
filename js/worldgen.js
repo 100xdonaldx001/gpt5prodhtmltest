@@ -6,6 +6,8 @@ import {
   rebuildGround,
   updateChunks,
   resetChunks,
+  procToggle,
+  toggleProcgen,
   setWorldSeed,
   setTerrainAmps,
   controls,
@@ -50,4 +52,10 @@ regenBtn.addEventListener('click', () => {
   resetChunks();
   updateChunks(true);
   alignPlayerToGround();
+});
+
+// Toggle procedural object generation
+procToggle.addEventListener('click', () => {
+  const on = toggleProcgen();
+  procToggle.textContent = on ? 'Objects: On' : 'Objects: Off';
 });
