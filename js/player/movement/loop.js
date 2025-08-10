@@ -6,6 +6,7 @@ import {
   renderer,
   setSun,
   sunLight,
+  moonLight,
   sunDir,
   sky,
   ground,
@@ -19,6 +20,7 @@ import {
   runMulInp,
   jumpInp,
   stepHInp,
+  moonStrengthInp,
   state,
   updateChunks,
   maybeRecenterGround,
@@ -130,6 +132,16 @@ function animate() {
     );
     sunLight.target.position.copy(obj.position);
     sunLight.target.updateMatrixWorld();
+    // Position the moon opposite the sun and apply user-defined strength
+    const moonStrength = Math.max(0, parseFloat(moonStrengthInp.value) || sunLight.intensity * 0.1);
+    moonLight.intensity = moonStrength;
+    moonLight.position.set(
+      obj.position.x - sunDir.x * dist,
+      obj.position.y - sunDir.y * dist,
+      obj.position.z - sunDir.z * dist
+    );
+    moonLight.target.position.copy(obj.position);
+    moonLight.target.updateMatrixWorld();
     sky.position.copy(obj.position);
     // Show current player position in the HUD
     posBox.textContent =
