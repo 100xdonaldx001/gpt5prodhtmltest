@@ -11,7 +11,7 @@ export {
   sunDir,
   sky,
 } from './environment.js';
-export { ground, heightAt, maybeRecenterGround, rebuildGround, setGroundSize } from './terrain.js';
+export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize } from './terrain.js';
 export {
   grid,
   blocks,

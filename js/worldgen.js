@@ -12,6 +12,7 @@ import {
   setTerrainAmps,
   controls,
   heightAt,
+  SEA_LEVEL,
 } from './core/index.js';
 
 // Generate a random 32-bit seed.
@@ -22,7 +23,9 @@ function randomSeed() {
 // Align the player with the terrain at their current position.
 function alignPlayerToGround() {
   const obj = controls.getObject();
-  const groundY = heightAt(obj.position.x, obj.position.z) + 2;
+  const terrainY = heightAt(obj.position.x, obj.position.z);
+  // Keep the player above water if terrain is below sea level.
+  const groundY = Math.max(terrainY, SEA_LEVEL) + 2;
   if (obj.position.y < groundY) {
     obj.position.y = groundY;
   }
