@@ -49,7 +49,7 @@ function rebuildAABBs() {
   chunksGroup.traverse(collect);
   userGroup.updateMatrixWorld(true);
   userGroup.traverse(collect);
-  // Include terrain voxels for player collision and stepping
+  // Include terrain mesh for player collision and stepping
   ground.updateMatrixWorld(true);
   ground.traverse(collect);
 }

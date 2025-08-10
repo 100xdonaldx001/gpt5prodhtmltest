@@ -1,6 +1,6 @@
 import { THREE } from './environment.js';
 
-// Cache materials by color to avoid cloning shader uniforms for every voxel
+// Cache materials by color to avoid cloning shader uniforms for every block
 const materialCache = new Map();
 
 // Return a lambert shader material with shadow support
@@ -21,18 +21,9 @@ function createBlockMaterial(color) {
   return materialCache.get(color);
 }
 
-// Create a material that snaps vertex positions to a grid for a voxel look
-function createVoxelTerrainMaterial() {
-  const mat = new THREE.MeshStandardMaterial({ color: 0x35506e, roughness: 0.95 });
-  mat.onBeforeCompile = (shader) => {
-    shader.uniforms.voxelSize = { value: 4.0 };
-    shader.vertexShader = 'uniform float voxelSize;\n' + shader.vertexShader;
-    shader.vertexShader = shader.vertexShader.replace(
-      '#include <begin_vertex>',
-      '#include <begin_vertex>\ntransformed = floor(transformed / voxelSize) * voxelSize;'
-    );
-  };
-  return mat;
+// Create a standard material for smooth terrain
+function createTerrainMaterial() {
+  return new THREE.MeshStandardMaterial({ color: 0x35506e, roughness: 0.95 });
 }
 
-export { createBlockMaterial, createVoxelTerrainMaterial };
+export { createBlockMaterial, createTerrainMaterial };
