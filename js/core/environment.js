@@ -23,12 +23,14 @@ document.body.appendChild(renderer.domElement);
 const sky = new Sky();
 sky.scale.setScalar(10000);
 scene.add(sky);
-const sun = new THREE.Vector3();
+// Direction vector pointing from origin toward the sun
+const sunDir = new THREE.Vector3();
+// Update sun direction and sky shader based on elevation and azimuth
 function setSun(elevation = 20, azimuth = 130) {
   const phi = THREE.MathUtils.degToRad(90 - elevation);
   const theta = THREE.MathUtils.degToRad(azimuth);
-  sun.setFromSphericalCoords(1, phi, theta);
-  sky.material.uniforms['sunPosition'].value.copy(sun);
+  sunDir.setFromSphericalCoords(1, phi, theta);
+  sky.material.uniforms['sunPosition'].value.copy(sunDir);
 }
 sky.material.uniforms['turbidity'].value = 2.0;
 sky.material.uniforms['rayleigh'].value = 1.2;
@@ -67,4 +69,5 @@ export {
   controls,
   setSun,
   sunLight,
+  sunDir,
 };

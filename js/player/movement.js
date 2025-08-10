@@ -4,7 +4,9 @@ import {
   controls,
   camera,
   renderer,
+  setSun,
   sunLight,
+  sunDir,
   ground,
   blocks,
   fpsBox,
@@ -14,6 +16,9 @@ import {
   runMulInp,
   jumpInp,
   stepHInp,
+  sunElevInp,
+  sunAziInp,
+  sunColorInp,
   state,
   updateChunks,
   maybeRecenterGround,
@@ -34,6 +39,9 @@ const playerRadius = 0.45;
 let vForward = 0,
   vRight = 0,
   vY = 0;
+let lastElev = 22,
+  lastAzi = 140,
+  lastColor = '#ffffff';
 
 function onKeyDown(e) {
   switch (e.code) {
@@ -96,6 +104,10 @@ function onKeyUp(e) {
 }
 document.addEventListener('keydown', onKeyDown);
 document.addEventListener('keyup', onKeyUp);
+sunColorInp.addEventListener('change', () => {
+  // Unfocus color picker so movement keys aren't captured
+  sunColorInp.blur();
+});
 
 const downRay = new THREE.Raycaster();
 
@@ -256,6 +268,18 @@ function animate() {
     runMul = Math.max(1, parseFloat(runMulInp.value) || 1.8);
     jumpStrength = Math.max(0.1, parseFloat(jumpInp.value) || 11.5);
     stepHeight = Math.max(0, parseFloat(stepHInp.value) || 0.5);
+    const elev = parseFloat(sunElevInp.value) || 22;
+    const azi = parseFloat(sunAziInp.value) || 140;
+    const col = sunColorInp.value || '#ffffff';
+    if (elev !== lastElev || azi !== lastAzi) {
+      setSun(elev, azi);
+      lastElev = elev;
+      lastAzi = azi;
+    }
+    if (col !== lastColor) {
+      sunLight.color.set(col);
+      lastColor = col;
+    }
 
     const speed = walk * (move.run ? runMul : 1);
     const accel = speed * 20;
@@ -312,8 +336,13 @@ function animate() {
 
     maybeRecenterGround(obj.position.x, obj.position.z);
     // Reposition sunlight to follow the player for consistent shadow coverage
-    sunLight.position.set(obj.position.x + 20, obj.position.y + 80, obj.position.z + 10);
-    sunLight.target.position.set(obj.position.x, obj.position.y, obj.position.z);
+    const dist = 100;
+    sunLight.position.set(
+      obj.position.x + sunDir.x * dist,
+      obj.position.y + sunDir.y * dist,
+      obj.position.z + sunDir.z * dist
+    );
+    sunLight.target.position.copy(obj.position);
     sunLight.target.updateMatrixWorld();
   }
 
