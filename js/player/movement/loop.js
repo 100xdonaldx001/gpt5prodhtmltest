@@ -19,13 +19,11 @@ import {
   runMulInp,
   jumpInp,
   stepHInp,
-  sunElevInp,
-  sunAziInp,
-  sunColorInp,
   state,
   updateChunks,
   maybeRecenterGround,
   rebuildAABBs,
+  updateEnvironment,
 } from '../../core/index.js';
 import { constrainPanel } from '../../ui.js';
 import movement from './state.js';
@@ -35,6 +33,7 @@ const { move } = movement;
 let last = performance.now(), frames = 0, acc = 0;
 const clock = new THREE.Clock();
 const downRay = new THREE.Raycaster();
+let dayTime = 0; // Tracks passage of time in the day-night cycle
 function approach(cur, target, maxStep) {
   if (cur < target) return Math.min(target, cur + maxStep);
   if (cur > target) return Math.max(target, cur - maxStep);
@@ -56,6 +55,12 @@ function animate() {
     frames = 0;
     acc = 0;
   }
+  // Advance global time and update sun/lighting
+  dayTime = (dayTime + delta * 0.01) % 1;
+  const sunElev = Math.sin(dayTime * Math.PI) * 45 + 5;
+  const sunAzi = dayTime * 360;
+  setSun(sunElev, sunAzi);
+  updateEnvironment(dayTime);
   updateChunks();
   // Only update player motion when enabled in the debug menu.
   if (state.isActive && (!window.__DEBUG || window.__DEBUG.movement)) {
@@ -65,18 +70,6 @@ function animate() {
     movement.runMul = Math.max(1, parseFloat(runMulInp.value) || 1.8);
     movement.jumpStrength = Math.max(0.1, parseFloat(jumpInp.value) || 11.5);
     movement.stepHeight = Math.max(0, parseFloat(stepHInp.value) || 1);
-    const elev = parseFloat(sunElevInp.value) || 22;
-    const azi = parseFloat(sunAziInp.value) || 140;
-    const col = sunColorInp.value || '#ffffff';
-    if (elev !== movement.lastElev || azi !== movement.lastAzi) {
-      setSun(elev, azi);
-      movement.lastElev = elev;
-      movement.lastAzi = azi;
-    }
-    if (col !== movement.lastColor) {
-      sunLight.color.set(col);
-      movement.lastColor = col;
-    }
     const speed = movement.walk * (move.run ? movement.runMul : 1);
     const accel = speed * 20;
     const maxStep = accel * delta;
