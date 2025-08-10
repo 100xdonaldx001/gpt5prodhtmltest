@@ -18,6 +18,8 @@ const loaded = new Map();
 let PROC_ENABLED = false;
 let CHUNK_SIZE = 32;
 let VIEW_DIST = 5;
+// Precomputed LOD thresholds in chunk units
+let LOD_RANGES = [5, 10, 15, 20];
 
 function key(cx, cz) {
   return cx + ',' + cz;
@@ -26,12 +28,15 @@ function worldToChunk(x, z) {
   return [Math.floor(x / CHUNK_SIZE), Math.floor(z / CHUNK_SIZE)];
 }
 
-function generateChunk(cx, cz) {
+// Create chunk geometry with detail scaled by LOD level
+function generateChunk(cx, cz, lod) {
   const g = new THREE.Group();
   g.userData.type = 'chunk';
   const seed = state.worldSeed ^ (cx * 73856093) ^ (cz * 19349663);
   const rand = mulberry32(seed >>> 0);
-  const count = 12 + Math.floor(rand() * 10);
+  // Scale number of spawned blocks based on LOD level
+  const detailMul = [1, 0.5, 0.25, 0.1][lod] || 0;
+  const count = Math.floor((12 + rand() * 10) * detailMul);
   for (let i = 0; i < count; i++) {
     const sx = 1 + Math.floor(rand() * 3);
     const sy = 0.6 + rand() * 1.8;
@@ -41,7 +46,7 @@ function generateChunk(cx, cz) {
     const worldX = cx * CHUNK_SIZE + localX;
     const worldZ = cz * CHUNK_SIZE + localZ;
     const terrainY = heightAt(worldX, worldZ);
-    // Skip placement if the location is underwater.
+    // Skip placement if the location is underwater
     if (terrainY <= SEA_LEVEL) continue;
     const y = terrainY + 0.2;
     const col = new THREE.Color().setHSL((rand() * 0.25 + 0.55) % 1, 0.55, 0.6).getHex();
@@ -52,11 +57,14 @@ function generateChunk(cx, cz) {
   return g;
 }
 
-function loadChunk(cx, cz) {
+// Load a chunk at a specific LOD level
+function loadChunk(cx, cz, lod) {
   const k = key(cx, cz);
-  if (loaded.has(k)) return;
-  const g = generateChunk(cx, cz);
-  loaded.set(k, { group: g });
+  const rec = loaded.get(k);
+  if (rec && rec.lod === lod) return;
+  if (rec) unloadChunk(cx, cz);
+  const g = generateChunk(cx, cz, lod);
+  loaded.set(k, { group: g, lod });
 }
 function unloadChunk(cx, cz) {
   const k = key(cx, cz);
@@ -90,8 +98,10 @@ function updateChunks(force = false, forcedPos = null) {
   lastChunkUpdate = now;
   CHUNK_SIZE = Math.max(8, parseInt(chunkSizeInp.value) || 32);
   VIEW_DIST = Math.max(1, Math.min(64, parseInt(viewDistInp.value) || 10));
-  // Always resize the ground to match the chosen view distance
-  setGroundSize((VIEW_DIST * 2 + 2) * CHUNK_SIZE);
+  // Define four LOD bands expanding the view distance
+  LOD_RANGES = [VIEW_DIST, VIEW_DIST * 2, VIEW_DIST * 3, VIEW_DIST * 4];
+  // Resize ground to cover the most distant LOD ring
+  setGroundSize((LOD_RANGES[3] * 2 + 2) * CHUNK_SIZE);
   // Update collision data for resized terrain
   rebuildAABBs();
 
@@ -103,17 +113,23 @@ function updateChunks(force = false, forcedPos = null) {
   const pz = forcedPos ? forcedPos.z : obj.position.z;
   const [ccx, ccz] = worldToChunk(px, pz);
 
-  const needed = new Set();
-  for (let dz = -VIEW_DIST; dz <= VIEW_DIST; dz++) {
-    for (let dx = -VIEW_DIST; dx <= VIEW_DIST; dx++) {
-      const nx = ccx + dx,
-        nz = ccz + dz;
-      needed.add(key(nx, nz));
+  const needed = new Map();
+  const maxRange = LOD_RANGES[3];
+  for (let dz = -maxRange; dz <= maxRange; dz++) {
+    for (let dx = -maxRange; dx <= maxRange; dx++) {
+      const nx = ccx + dx;
+      const nz = ccz + dz;
+      const dist = Math.max(Math.abs(dx), Math.abs(dz));
+      let lod = 3;
+      if (dist <= LOD_RANGES[0]) lod = 0;
+      else if (dist <= LOD_RANGES[1]) lod = 1;
+      else if (dist <= LOD_RANGES[2]) lod = 2;
+      needed.set(key(nx, nz), lod);
     }
   }
-  needed.forEach((k) => {
+  needed.forEach((lod, k) => {
     const [sx, sz] = k.split(',').map(Number);
-    loadChunk(sx, sz);
+    loadChunk(sx, sz, lod);
   });
   for (const k of Array.from(loaded.keys())) {
     if (!needed.has(k)) {
