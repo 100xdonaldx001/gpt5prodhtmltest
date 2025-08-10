@@ -1,10 +1,13 @@
 import {
   seedInp,
   regenBtn,
+  mountainAmpInp,
+  valleyAmpInp,
   rebuildGround,
   updateChunks,
   resetChunks,
   setWorldSeed,
+  setTerrainAmps,
   controls,
   heightAt,
 } from './core/index.js';
@@ -31,6 +34,18 @@ regenBtn.addEventListener('click', () => {
     seedInp.value = seed;
   }
   setWorldSeed(seed);
+  // Validate and apply mountain/valley amplification factors.
+  let mAmp = parseFloat(mountainAmpInp.value);
+  if (!Number.isFinite(mAmp)) {
+    mAmp = 240;
+    mountainAmpInp.value = mAmp;
+  }
+  let vAmp = parseFloat(valleyAmpInp.value);
+  if (!Number.isFinite(vAmp)) {
+    vAmp = 20;
+    valleyAmpInp.value = vAmp;
+  }
+  setTerrainAmps(mAmp, vAmp);
   rebuildGround();
   resetChunks();
   updateChunks(true);
