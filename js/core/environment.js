@@ -34,11 +34,70 @@ function setSun(elevation = 20, azimuth = 130) {
   sunDir.setFromSphericalCoords(1, phi, theta);
   sky.material.uniforms['sunPosition'].value.copy(sunDir);
 }
+// Configure atmospheric scattering parameters
 sky.material.uniforms['turbidity'].value = 2.0;
 sky.material.uniforms['rayleigh'].value = 1.2;
 sky.material.uniforms['mieCoefficient'].value = 0.003;
 sky.material.uniforms['mieDirectionalG'].value = 0.8;
 setSun(22, 140);
+
+// Helper to blend two colors
+function lerpColor(a, b, t) {
+  // Clone to avoid mutating the originals then interpolate
+  return a.clone().lerp(b, t);
+}
+
+// Predefined colors for day cycle phases
+const dawnColor = new THREE.Color(0xffc37d);
+const dayColor = new THREE.Color(0x87b3e8);
+const duskColor = new THREE.Color(0xff8a3c);
+const nightColor = new THREE.Color(0x0a0a33);
+const dawnSun = new THREE.Color(0xffdcb1);
+const daySun = new THREE.Color(0xffffff);
+const duskSun = new THREE.Color(0xffb36c);
+const nightSun = new THREE.Color(0x222244);
+
+// Update lighting, fog and background based on time [0,1)
+function updateEnvironment(time) {
+  let bg, sunCol, intensity, fogNear, fogFar;
+  if (time < 0.25) {
+    const t = time / 0.25;
+    bg = lerpColor(nightColor, dawnColor, t);
+    sunCol = lerpColor(nightSun, dawnSun, t);
+    intensity = 0.2 + 0.3 * t;
+    fogNear = 60 + 60 * t;
+    fogFar = 500 + 2500 * t;
+  } else if (time < 0.5) {
+    const t = (time - 0.25) / 0.25;
+    bg = lerpColor(dawnColor, dayColor, t);
+    sunCol = lerpColor(dawnSun, daySun, t);
+    intensity = 0.5 + 0.4 * t;
+    fogNear = 120;
+    fogFar = 3000;
+  } else if (time < 0.75) {
+    const t = (time - 0.5) / 0.25;
+    bg = lerpColor(dayColor, duskColor, t);
+    sunCol = lerpColor(daySun, duskSun, t);
+    intensity = 0.9 - 0.4 * t;
+    fogNear = 120 - 60 * t;
+    fogFar = 3000 - 2500 * t;
+  } else {
+    const t = (time - 0.75) / 0.25;
+    bg = lerpColor(duskColor, nightColor, t);
+    sunCol = lerpColor(duskSun, nightSun, t);
+    intensity = 0.5 - 0.3 * t;
+    fogNear = 60;
+    fogFar = 500;
+  }
+  // Apply computed values to scene and lights
+  scene.background.copy(bg);
+  scene.fog.color.copy(bg);
+  scene.fog.near = fogNear;
+  scene.fog.far = fogFar;
+  sunLight.color.copy(sunCol);
+  sunLight.intensity = intensity;
+  hemi.intensity = 0.3 + 0.5 * intensity;
+}
 
 // Lights
 const hemi = new THREE.HemisphereLight(0xddeeff, 0x223344, 0.8);
@@ -73,4 +132,5 @@ export {
   sunLight,
   sunDir,
   sky,
+  updateEnvironment,
 };

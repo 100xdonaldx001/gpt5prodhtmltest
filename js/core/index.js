@@ -10,6 +10,7 @@ export {
   sunLight,
   sunDir,
   sky,
+  updateEnvironment,
 } from './environment.js';
 export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize } from '../world/terrain.js';
 export {
