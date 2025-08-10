@@ -41,7 +41,7 @@ function rebuildAABBs() {
     if (!mesh.isMesh) return;
     if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
     const b = mesh.geometry.boundingBox.clone().applyMatrix4(mesh.matrixWorld);
-    blockAABBs.push({ box: b, mesh });
+    blockAABBs.push({ box: b, mesh, isGround: mesh === ground });
   };
   presetGroup.updateMatrixWorld(true);
   presetGroup.traverse(collect);
