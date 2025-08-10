@@ -32,6 +32,8 @@ const worldgenPanel = document.getElementById('worldgen');
 const worldHandle = document.getElementById('worldHandle');
 const seedInp = document.getElementById('seed');
 const regenBtn = document.getElementById('regen');
+const mountainAmpInp = document.getElementById('mountainAmp');
+const valleyAmpInp = document.getElementById('valleyAmp');
 
 export {
   overlay,
@@ -66,4 +68,6 @@ export {
   worldHandle,
   seedInp,
   regenBtn,
+  mountainAmpInp,
+  valleyAmpInp,
 };

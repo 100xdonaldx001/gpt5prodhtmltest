@@ -56,5 +56,7 @@ export {
   worldHandle,
   seedInp,
   regenBtn,
+  mountainAmpInp,
+  valleyAmpInp,
 } from './dom.js';
-export { state, setWorldSeed } from './state.js';
+export { state, setWorldSeed, setTerrainAmps } from './state.js';
