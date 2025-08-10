@@ -36,6 +36,7 @@
 
     #settings { left: 12px; top: 12px; }
     #builder { left: 12px; top: 200px; }
+    #worldgen { left: 12px; top: 388px; }
 
     #builderToggle { position: fixed; left: 12px; top: 12px; z-index: 6; padding: 6px 10px; font-size: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(90,200,250,.25); color: #eaf7ff; cursor: pointer; }
     #builderToggle:hover { filter: brightness(1.05); }
