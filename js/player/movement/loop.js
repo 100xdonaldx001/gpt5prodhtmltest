@@ -34,6 +34,12 @@ const { move } = movement;
 let last = performance.now(), frames = 0, acc = 0;
 const clock = new THREE.Clock();
 const downRay = new THREE.Raycaster();
+// Reuse vectors to avoid creating new objects every frame
+const downOrigin = new THREE.Vector3();
+const downDir = new THREE.Vector3(0, -1, 0);
+const forward = new THREE.Vector3();
+const right = new THREE.Vector3();
+const dirWorld = new THREE.Vector3();
 function approach(cur, target, maxStep) {
   if (cur < target) return Math.min(target, cur + maxStep);
   if (cur > target) return Math.max(target, cur - maxStep);
@@ -88,8 +94,9 @@ function animate() {
     const prevHeadY = prevY;
     obj.position.y += movement.vY * delta;
     resolveVerticalCollisions(prevFeetY, prevHeadY, obj.position);
-    const downOrigin = new THREE.Vector3(obj.position.x, obj.position.y, obj.position.z);
-    downRay.set(downOrigin, new THREE.Vector3(0, -1, 0));
+    // Use preallocated vectors for raycasting
+    downOrigin.copy(obj.position);
+    downRay.set(downOrigin, downDir);
     const hits = downRay.intersectObjects([ground, blocks], true);
     const minDist = movement.playerHeight;
     if (hits.length) {
@@ -112,10 +119,11 @@ function animate() {
     if (collided) {
       attemptStepUp(obj);
     } else {
-      const yaw = controls.getObject().rotation.y;
-      const forward = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
-      const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
-      const dirWorld = forward.multiplyScalar(movement.vForward).add(right.multiplyScalar(movement.vRight));
+      const yaw = obj.rotation.y;
+      // Reuse vectors to compute world direction without allocations
+      forward.set(Math.sin(yaw), 0, Math.cos(yaw)).multiplyScalar(movement.vForward);
+      right.set(Math.cos(yaw), 0, -Math.sin(yaw)).multiplyScalar(movement.vRight);
+      dirWorld.copy(forward).add(right);
       attemptStepUpProbe(obj, dirWorld);
     }
     if (maybeRecenterGround(obj.position.x, obj.position.z)) rebuildAABBs();
