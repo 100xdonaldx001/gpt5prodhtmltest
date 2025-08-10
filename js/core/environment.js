@@ -81,6 +81,11 @@ sunLight.shadow.camera.top = shadowRange;
 sunLight.shadow.camera.bottom = -shadowRange;
 scene.add(sunLight);
 
+// Add a subtle moon light opposite the sun
+const moonLight = new THREE.DirectionalLight(0xffffff, sunLight.intensity * 0.1);
+moonLight.castShadow = false;
+scene.add(moonLight);
+
 // Controls
 const controls = new PointerLockControls(camera, document.body);
 scene.add(controls.getObject());
@@ -95,6 +100,7 @@ export {
   controls,
   setSun,
   sunLight,
+  moonLight,
   sunDir,
   sky,
   updateEnvironment,
