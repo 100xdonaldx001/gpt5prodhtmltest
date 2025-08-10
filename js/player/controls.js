@@ -8,6 +8,7 @@ import {
   crosshair,
   fpsBox,
   posBox,
+  timeBox,
   testsBox,
   warnBox,
   settingsPanel,
@@ -29,6 +30,7 @@ function showUI(active) {
   crosshair.hidden = !active;
   fpsBox.hidden = !active;
   posBox.hidden = !active;
+  timeBox.hidden = !active;
   testsBox.hidden = !active;
   settingsPanel.hidden = !active;
   worldgenPanel.hidden = !active;

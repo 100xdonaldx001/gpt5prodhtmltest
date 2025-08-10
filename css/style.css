@@ -15,6 +15,7 @@
     #fps { position: fixed; right: 12px; top: 10px; background: rgba(15,22,30,.55); padding: 6px 10px; border-radius: 8px; font: 12px/1.2 monospace; opacity: .8; }
     #tests { position: fixed; right: 12px; top: 40px; background: rgba(15,22,30,.55); padding: 6px 10px; border-radius: 8px; font: 12px/1.2 monospace; opacity: .85; }
   #pos { position: fixed; right: 12px; top: 70px; background: rgba(15,22,30,.55); padding: 6px 10px; border-radius: 8px; font: 12px/1.2 monospace; opacity: .8; }
+  #time { position: fixed; right: 12px; top: 100px; background: rgba(15,22,30,.55); padding: 6px 10px; border-radius: 8px; font: 12px/1.2 monospace; opacity: .8; }
     #warn { position: fixed; left: 50%; top: 12px; transform: translateX(-50%); background: rgba(255,184,76,.15); color: #ffd08a; border: 1px solid rgba(255,184,76,.35); padding: 6px 10px; border-radius: 10px; font: 12px/1.2 system-ui; z-index: 3; }
 
     /* Crosshair */

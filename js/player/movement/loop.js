@@ -12,6 +12,7 @@ import {
   blocks,
   fpsBox,
   posBox,
+  timeBox,
   settingsPanel,
   builder,
   worldgenPanel,
@@ -34,6 +35,15 @@ let last = performance.now(), frames = 0, acc = 0;
 const clock = new THREE.Clock();
 const downRay = new THREE.Raycaster();
 let dayTime = 0; // Tracks passage of time in the day-night cycle
+
+function updateTimeDisplay() {
+  // Convert dayTime (0–1) to total minutes in a 24h cycle
+  const totalMinutes = Math.floor(dayTime * 24 * 60);
+  // Format hours and minutes with leading zeros
+  const hours = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
+  const minutes = String(totalMinutes % 60).padStart(2, '0');
+  timeBox.textContent = `${hours}:${minutes}`;
+}
 function approach(cur, target, maxStep) {
   if (cur < target) return Math.min(target, cur + maxStep);
   if (cur > target) return Math.max(target, cur - maxStep);
@@ -62,6 +72,7 @@ function animate() {
   const sunAz = dayTime * 360;
   setSun(sunElev, sunAz);
   updateEnvironment(sunElev);
+  updateTimeDisplay();
   updateChunks();
   // Only update player motion when enabled in the debug menu.
   if (state.isActive && (!window.__DEBUG || window.__DEBUG.movement)) {
