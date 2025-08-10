@@ -25,6 +25,7 @@ import {
   updateChunks,
   maybeRecenterGround,
   blockAABBs,
+  rebuildAABBs,
 } from '../core/index.js';
 import { toggleBuilder } from '../builder.js';
 import { constrainPanel } from '../ui.js';
@@ -35,7 +36,8 @@ const gravity = 30;
 let walk = 10;
 let runMul = 1.8;
 let jumpStrength = 11.5;
-let stepHeight = 0.5;
+// Height the player can step over; matches voxel height
+let stepHeight = 1;
 const playerHeight = 1.75;
 const playerRadius = 0.45;
 let vForward = 0,
@@ -269,7 +271,7 @@ function animate() {
     walk = Math.max(0.1, parseFloat(speedInp.value) || 10);
     runMul = Math.max(1, parseFloat(runMulInp.value) || 1.8);
     jumpStrength = Math.max(0.1, parseFloat(jumpInp.value) || 11.5);
-    stepHeight = Math.max(0, parseFloat(stepHInp.value) || 0.5);
+    stepHeight = Math.max(0, parseFloat(stepHInp.value) || 1);
     const elev = parseFloat(sunElevInp.value) || 22;
     const azi = parseFloat(sunAziInp.value) || 140;
     const col = sunColorInp.value || '#ffffff';
@@ -336,7 +338,9 @@ function animate() {
       attemptStepUpProbe(obj, dirWorld);
     }
 
-    maybeRecenterGround(obj.position.x, obj.position.z);
+    if (maybeRecenterGround(obj.position.x, obj.position.z)) {
+      rebuildAABBs();
+    }
     // Reposition sunlight to follow the player for consistent shadow coverage
     const dist = 100;
     sunLight.position.set(

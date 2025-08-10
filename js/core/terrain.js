@@ -5,8 +5,8 @@ import { state } from './state.js';
 // Water level for oceans, lakes, and rivers
 const SEA_LEVEL = -10;
 
-// Size of each cubic voxel
-const VOXEL_SIZE = 4;
+// Size of each cubic voxel (scaled down for finer terrain)
+const VOXEL_SIZE = 1;
 
 // Default span of generated terrain around the player
 let groundSize = 128;
@@ -260,21 +260,19 @@ function rebuildGround() {
     for (let x = -max; x < max; x += step) {
       for (let z = -max; z < max; z += step) {
         if (Math.abs(x) < min && Math.abs(z) < min) continue;
-        for (let y = -40; y < 80; y += step) {
-          const wx = groundCenter.x + x;
-          const wy = y;
-          const wz = groundCenter.y + z;
-          if (densityAt(wx, wy, wz) > 0) {
-            const feature = featureAt(wx, wz);
-            const color = blockColor(wx, wy, wz, feature);
-            const mat = createBlockMaterial(color);
-            const geo = getBoxGeometry(step);
-            const cube = new THREE.Mesh(geo, mat);
-            cube.position.set(wx + step / 2, wy + step / 2, wz + step / 2);
-            cube.castShadow = cube.receiveShadow = true;
-            ground.add(cube);
-          }
-        }
+        const wx = groundCenter.x + x;
+        const wz = groundCenter.y + z;
+        // Only sample the topmost solid voxel at this position
+        const wy = heightAt(wx, wz);
+        if (wy <= -40) continue;
+        const feature = featureAt(wx, wz);
+        const color = blockColor(wx, wy, wz, feature);
+        const mat = createBlockMaterial(color);
+        const geo = getBoxGeometry(step);
+        const cube = new THREE.Mesh(geo, mat);
+        cube.position.set(wx + step / 2, wy + step / 2, wz + step / 2);
+        cube.castShadow = cube.receiveShadow = true;
+        ground.add(cube);
       }
     }
   }
@@ -304,7 +302,10 @@ function maybeRecenterGround(playerX, playerZ) {
     groundCenter.x = Math.round(playerX / (groundSize * 0.25)) * (groundSize * 0.25);
     groundCenter.y = Math.round(playerZ / (groundSize * 0.25)) * (groundSize * 0.25);
     rebuildGround();
+    // Signal to callers that ground was rebuilt
+    return true;
   }
+  return false;
 }
 
 export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize };

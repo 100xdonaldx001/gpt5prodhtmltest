@@ -4,6 +4,7 @@ import {
   mountainAmpInp,
   valleyAmpInp,
   rebuildGround,
+  rebuildAABBs,
   updateChunks,
   resetChunks,
   procToggle,
@@ -52,6 +53,7 @@ regenBtn.addEventListener('click', () => {
   }
   setTerrainAmps(mAmp, vAmp);
   rebuildGround();
+  rebuildAABBs();
   resetChunks();
   updateChunks(true);
   alignPlayerToGround();
