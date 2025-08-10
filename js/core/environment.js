@@ -81,10 +81,24 @@ sunLight.shadow.camera.top = shadowRange;
 sunLight.shadow.camera.bottom = -shadowRange;
 scene.add(sunLight);
 
-// Add a subtle moon light opposite the sun
-const moonLight = new THREE.DirectionalLight(0xffffff, sunLight.intensity * 0.1);
-moonLight.castShadow = false;
+// Add a moon light opposite the sun
+const moonLight = new THREE.DirectionalLight(0xffffff, 0.2);
+// Let the moon light cast shadows like the sun
+moonLight.castShadow = true;
+moonLight.shadow.mapSize.set(2048, 2048);
+moonLight.shadow.camera.near = 1;
+moonLight.shadow.camera.far = 500;
+moonLight.shadow.camera.left = -shadowRange;
+moonLight.shadow.camera.right = shadowRange;
+moonLight.shadow.camera.top = shadowRange;
+moonLight.shadow.camera.bottom = -shadowRange;
 scene.add(moonLight);
+// Create a simple sphere to represent the visible moon
+const moon = new THREE.Mesh(
+  new THREE.SphereGeometry(5, 16, 16),
+  new THREE.MeshBasicMaterial({ color: 0xffffff })
+);
+scene.add(moon);
 
 // Controls
 const controls = new PointerLockControls(camera, document.body);
@@ -101,6 +115,7 @@ export {
   setSun,
   sunLight,
   moonLight,
+  moon,
   sunDir,
   sky,
   updateEnvironment,
