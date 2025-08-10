@@ -139,6 +139,8 @@ function animate() {
   }
   renderer.render(scene, camera);
 }
+// Set initial player position before starting the loop to avoid a visible teleport.
+controls.getObject().position.set(0, movement.playerHeight + 1, 8);
 animate();
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -148,4 +150,3 @@ window.addEventListener('resize', () => {
   constrainPanel(builder);
   constrainPanel(worldgenPanel);
 });
-controls.getObject().position.set(0, movement.playerHeight + 1, 8);
