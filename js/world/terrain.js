@@ -71,7 +71,11 @@ function maybeRecenterGround(playerX, playerZ) {
     groundCenter.x = Math.round(playerX / (groundSize * 0.25)) * (groundSize * 0.25);
     groundCenter.y = Math.round(playerZ / (groundSize * 0.25)) * (groundSize * 0.25);
     rebuildGround();
+    // Signal that the terrain was recentered so callers can update collisions.
+    return true;
   }
+  // No recentering needed this frame.
+  return false;
 }
 
 export { ground, water, SEA_LEVEL, heightAt, maybeRecenterGround, rebuildGround, setGroundSize };
