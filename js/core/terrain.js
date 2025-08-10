@@ -25,6 +25,15 @@ const water = new THREE.Mesh(waterGeo, waterMat);
 water.receiveShadow = true;
 scene.add(water);
 
+// Cache box geometries to avoid recreating identical meshes
+const geometryCache = {};
+function getBoxGeometry(size) {
+  if (!geometryCache[size]) {
+    geometryCache[size] = new THREE.BoxGeometry(size, size, size);
+  }
+  return geometryCache[size];
+}
+
 // Pseudo-random generator producing deterministic values for terrain
 function mulberry32(a) {
   return function () {
@@ -233,33 +242,43 @@ function heightAt(x, z) {
 
 let groundCenter = new THREE.Vector2(0, 0);
 
-// Rebuild voxel terrain around the current ground center
+// Rebuild voxel terrain around the current ground center using basic LOD
 function rebuildGround() {
   // Dispose previous voxel meshes
   while (ground.children.length) {
-    const m = ground.children.pop();
-    m.geometry.dispose();
-    m.material.dispose();
+    const m = ground.children[ground.children.length - 1];
+    ground.remove(m);
   }
-  const half = groundSize / 2;
-  for (let x = -half; x < half; x += VOXEL_SIZE) {
-    for (let z = -half; z < half; z += VOXEL_SIZE) {
-      for (let y = -40; y < 80; y += VOXEL_SIZE) {
-        const wx = groundCenter.x + x;
-        const wy = y;
-        const wz = groundCenter.y + z;
-        if (densityAt(wx, wy, wz) > 0) {
-          const feature = featureAt(wx, wz);
-          const color = blockColor(wx, wy, wz, feature);
-          const mat = createBlockMaterial(color);
-          const cube = new THREE.Mesh(new THREE.BoxGeometry(VOXEL_SIZE, VOXEL_SIZE, VOXEL_SIZE), mat);
-          cube.position.set(wx + VOXEL_SIZE / 2, wy + VOXEL_SIZE / 2, wz + VOXEL_SIZE / 2);
-          cube.castShadow = cube.receiveShadow = true;
-          ground.add(cube);
+
+  // Rings define LOD levels: closer rings use smaller steps
+  const rings = [
+    { min: 0, max: groundSize * 0.25, step: VOXEL_SIZE },
+    { min: groundSize * 0.25, max: groundSize * 0.5, step: VOXEL_SIZE * 2 },
+  ];
+
+  for (const { min, max, step } of rings) {
+    for (let x = -max; x < max; x += step) {
+      for (let z = -max; z < max; z += step) {
+        if (Math.abs(x) < min && Math.abs(z) < min) continue;
+        for (let y = -40; y < 80; y += step) {
+          const wx = groundCenter.x + x;
+          const wy = y;
+          const wz = groundCenter.y + z;
+          if (densityAt(wx, wy, wz) > 0) {
+            const feature = featureAt(wx, wz);
+            const color = blockColor(wx, wy, wz, feature);
+            const mat = createBlockMaterial(color);
+            const geo = getBoxGeometry(step);
+            const cube = new THREE.Mesh(geo, mat);
+            cube.position.set(wx + step / 2, wy + step / 2, wz + step / 2);
+            cube.castShadow = cube.receiveShadow = true;
+            ground.add(cube);
+          }
         }
       }
     }
   }
+
   // Recenter water plane so rivers and oceans follow the terrain
   water.position.set(groundCenter.x, SEA_LEVEL, groundCenter.y);
 }
