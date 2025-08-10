@@ -16,7 +16,7 @@ blocks.add(chunksGroup);
 const userGroup = new THREE.Group();
 blocks.add(userGroup);
 
-function addBlockTo(group, x, y, z, sx = 4, sy = 1, sz = 4, color = 0x6ee7ff) {
+function addBlockTo(group, x, y, z, sx = 1, sy = 1, sz = 1, color = 0x6ee7ff) {
   // Use custom shader material for lighting and shadow support
   const mat = createBlockMaterial(color);
   const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), mat);
@@ -49,6 +49,9 @@ function rebuildAABBs() {
   chunksGroup.traverse(collect);
   userGroup.updateMatrixWorld(true);
   userGroup.traverse(collect);
+  // Include terrain voxels for player collision and stepping
+  ground.updateMatrixWorld(true);
+  ground.traverse(collect);
 }
 rebuildAABBs();
 

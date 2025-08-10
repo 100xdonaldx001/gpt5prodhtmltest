@@ -90,6 +90,8 @@ function updateChunks(force = false, forcedPos = null) {
   VIEW_DIST = Math.max(1, Math.min(64, parseInt(viewDistInp.value) || 10));
   // Always resize the ground to match the chosen view distance
   setGroundSize((VIEW_DIST * 2 + 2) * CHUNK_SIZE);
+  // Update collision data for resized terrain
+  rebuildAABBs();
 
   // Skip chunk generation when procedural objects are disabled
   if (!PROC_ENABLED) return;
