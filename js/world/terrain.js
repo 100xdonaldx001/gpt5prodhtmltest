@@ -32,12 +32,39 @@ water.receiveShadow = true;
 scene.add(ground);
 scene.add(water);
 
-// Precompute colors used for terrain shading
-const waterFloorColor = new THREE.Color(0x5c6e7e); // grayish blue for seabeds
-const grassA = new THREE.Color(0x2e8f2e); // dark green
-const grassB = new THREE.Color(0x5cad49); // light green
-const stoneColor = new THREE.Color(0x777777); // gray for steep slopes
+// Options controlling base colors and slope thresholds for shading
+const defaultTerrainOpts = {
+  waterFloorColor: new THREE.Color(0x5c6e7e), // grayish blue for seabeds
+  grassA: new THREE.Color(0x2e8f2e), // dark green
+  grassB: new THREE.Color(0x5cad49), // light green
+  stoneColor: new THREE.Color(0x777777), // gray for steep slopes
+  rockSlopeStart: 2, // slope value where rocks begin to appear
+  rockSlopeRange: 10, // additional slope needed to become full rock
+};
+let terrainOpts = { ...defaultTerrainOpts };
 const tmpColor = new THREE.Color(); // scratch color for interpolation
+
+// Update terrain color and slope settings
+function setTerrainOptions(opts = {}) {
+  if (opts.waterFloorColor) terrainOpts.waterFloorColor.set(opts.waterFloorColor);
+  if (opts.grassA) terrainOpts.grassA.set(opts.grassA);
+  if (opts.grassB) terrainOpts.grassB.set(opts.grassB);
+  if (opts.stoneColor) terrainOpts.stoneColor.set(opts.stoneColor);
+  if (typeof opts.rockSlopeStart === 'number') terrainOpts.rockSlopeStart = opts.rockSlopeStart;
+  if (typeof opts.rockSlopeRange === 'number') terrainOpts.rockSlopeRange = opts.rockSlopeRange;
+}
+
+// Return a copy of current terrain options
+function getTerrainOptions() {
+  return {
+    waterFloorColor: terrainOpts.waterFloorColor.clone(),
+    grassA: terrainOpts.grassA.clone(),
+    grassB: terrainOpts.grassB.clone(),
+    stoneColor: terrainOpts.stoneColor.clone(),
+    rockSlopeStart: terrainOpts.rockSlopeStart,
+    rockSlopeRange: terrainOpts.rockSlopeRange,
+  };
+}
 
 let groundCenter = new THREE.Vector2(0, 0);
 function rebuildGround() {
@@ -66,16 +93,20 @@ function rebuildGround() {
 
     if (h < SEA_LEVEL) {
       // Sea floor takes on a muted blue color
-      colors[i] = waterFloorColor.r;
-      colors[i + 1] = waterFloorColor.g;
-      colors[i + 2] = waterFloorColor.b;
+      colors[i] = terrainOpts.waterFloorColor.r;
+      colors[i + 1] = terrainOpts.waterFloorColor.g;
+      colors[i + 2] = terrainOpts.waterFloorColor.b;
     } else {
       // Use smooth noise to vary green shades subtly across the land
       const n = (fbm2D(wx * 0.05, wz * 0.05) + 1) / 2;
-      tmpColor.copy(grassA).lerp(grassB, n);
+      tmpColor.copy(terrainOpts.grassA).lerp(terrainOpts.grassB, n);
       // Blend towards gray rock when slopes become steep
-      const rockMix = THREE.MathUtils.clamp((slope - 2) / 10, 0, 1);
-      tmpColor.lerp(stoneColor, rockMix);
+      const rockMix = THREE.MathUtils.clamp(
+        (slope - terrainOpts.rockSlopeStart) / terrainOpts.rockSlopeRange,
+        0,
+        1
+      );
+      tmpColor.lerp(terrainOpts.stoneColor, rockMix);
       colors[i] = tmpColor.r;
       colors[i + 1] = tmpColor.g;
       colors[i + 2] = tmpColor.b;
@@ -143,4 +174,6 @@ export {
   rebuildGround,
   setGroundSize,
   setSeaLevel,
+  setTerrainOptions,
+  getTerrainOptions,
 };
