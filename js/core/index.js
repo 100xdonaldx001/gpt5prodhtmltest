@@ -6,7 +6,9 @@ export {
   camera,
   renderer,
   controls,
+  setSun,
   sunLight,
+  sunDir,
 } from './environment.js';
 export { ground, heightAt, maybeRecenterGround, rebuildGround } from './terrain.js';
 export {
@@ -45,5 +47,8 @@ export {
   stepHInp,
   viewDistInp,
   chunkSizeInp,
+  sunElevInp,
+  sunAziInp,
+  sunColorInp,
 } from './dom.js';
 export { state } from './state.js';
