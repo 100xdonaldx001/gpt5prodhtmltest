@@ -7,6 +7,7 @@ import {
   setSun,
   sunLight,
   moonLight,
+  moon,
   sunDir,
   sky,
   ground,
@@ -39,8 +40,8 @@ const downRay = new THREE.Raycaster();
 let dayTime = 0; // Tracks passage of time in the day-night cycle
 
 function updateTimeDisplay() {
-  // Convert dayTime (0–1) to total minutes in a 24h cycle
-  const totalMinutes = Math.floor(dayTime * 24 * 60);
+  // Convert dayTime (0–1) to total minutes in a 24h cycle with a 6h offset
+  const totalMinutes = Math.floor(((dayTime + 0.25) % 1) * 24 * 60);
   // Format hours and minutes with leading zeros
   const hours = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
   const minutes = String(totalMinutes % 60).padStart(2, '0');
@@ -144,8 +145,8 @@ function animate() {
     sunLight.target.position.copy(obj.position);
     sunLight.target.updateMatrixWorld();
     // Position the moon opposite the sun and apply user-defined strength
-    const moonStrength = Math.max(0, parseFloat(moonStrengthInp.value) || sunLight.intensity * 0.1);
-    moonLight.intensity = moonStrength;
+    const moonStrength = parseFloat(moonStrengthInp.value);
+    moonLight.intensity = Number.isFinite(moonStrength) ? moonStrength : 0.2;
     moonLight.position.set(
       obj.position.x - sunDir.x * dist,
       obj.position.y - sunDir.y * dist,
@@ -153,6 +154,8 @@ function animate() {
     );
     moonLight.target.position.copy(obj.position);
     moonLight.target.updateMatrixWorld();
+    // Keep the visible moon mesh aligned with the light
+    moon.position.copy(moonLight.position);
     sky.position.copy(obj.position);
     // Show current player position in the HUD
     posBox.textContent =

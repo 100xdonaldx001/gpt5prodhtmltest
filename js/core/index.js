@@ -9,6 +9,7 @@ export {
   setSun,
   sunLight,
   moonLight,
+  moon,
   sunDir,
   sky,
   updateEnvironment,
