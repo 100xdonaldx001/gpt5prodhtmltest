@@ -1,4 +1,5 @@
 import { THREE, scene } from './environment.js';
+import { state } from './state.js';
 
 const GROUND_SIZE = 800;
 const GROUND_SEG = 128;
@@ -9,8 +10,51 @@ const ground = new THREE.Mesh(groundGeo, groundMat);
 ground.receiveShadow = true;
 scene.add(ground);
 
+// Pseudo-random generator producing deterministic values for terrain.
+function mulberry32(a) {
+  return function () {
+    let t = (a += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Simple 2D value noise for hills and valleys.
+function noise2D(x, z) {
+  const sx = Math.floor(x);
+  const sz = Math.floor(z);
+  const fx = x - sx;
+  const fz = z - sz;
+  const seed = state.worldSeed >>> 0;
+  const n00 = mulberry32(seed ^ (sx * 73856093) ^ (sz * 19349663))();
+  const n10 = mulberry32(seed ^ ((sx + 1) * 73856093) ^ (sz * 19349663))();
+  const n01 = mulberry32(seed ^ (sx * 73856093) ^ ((sz + 1) * 19349663))();
+  const n11 = mulberry32(seed ^ ((sx + 1) * 73856093) ^ ((sz + 1) * 19349663))();
+  const nx0 = n00 * (1 - fx) + n10 * fx;
+  const nx1 = n01 * (1 - fx) + n11 * fx;
+  return nx0 * (1 - fz) + nx1 * fz;
+}
+
+// Fractal Brownian motion combines multiple noise layers for smoother terrain.
+function fbm2D(x, z) {
+  let total = 0;
+  let amplitude = 1;
+  let frequency = 1;
+  let max = 0;
+  for (let i = 0; i < 4; i++) {
+    total += noise2D(x * frequency, z * frequency) * amplitude;
+    max += amplitude;
+    amplitude *= 0.5;
+    frequency *= 2;
+  }
+  return total / max;
+}
+
+// Height map favoring valleys but allowing more mountains with smooth slopes.
 function heightAt(x, z) {
-  return Math.sin(x * 0.05) * Math.cos(z * 0.05) * 0.6;
+  const n = fbm2D(x * 0.01, z * 0.01);
+  return (n - 0.55) * 20;
 }
 
 let groundCenter = new THREE.Vector2(0, 0);

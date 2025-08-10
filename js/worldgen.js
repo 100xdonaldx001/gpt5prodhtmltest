@@ -1,0 +1,38 @@
+import {
+  seedInp,
+  regenBtn,
+  rebuildGround,
+  updateChunks,
+  resetChunks,
+  setWorldSeed,
+  controls,
+  heightAt,
+} from './core/index.js';
+
+// Generate a random 32-bit seed.
+function randomSeed() {
+  return Math.floor(Math.random() * 0xffffffff);
+}
+
+// Align the player with the terrain at their current position.
+function alignPlayerToGround() {
+  const obj = controls.getObject();
+  const groundY = heightAt(obj.position.x, obj.position.z) + 2;
+  if (obj.position.y < groundY) {
+    obj.position.y = groundY;
+  }
+}
+
+// Apply seed and rebuild world when the regenerate button is pressed.
+regenBtn.addEventListener('click', () => {
+  let seed = parseInt(seedInp.value);
+  if (!Number.isFinite(seed)) {
+    seed = randomSeed();
+    seedInp.value = seed;
+  }
+  setWorldSeed(seed);
+  rebuildGround();
+  resetChunks();
+  updateChunks(true);
+  alignPlayerToGround();
+});

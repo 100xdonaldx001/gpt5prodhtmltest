@@ -12,6 +12,7 @@ import {
   settingsPanel,
   builder,
   builderToggle,
+  worldgenPanel,
   state,
 } from '../core/index.js';
 import { updatePreview } from '../builder.js';
@@ -26,6 +27,7 @@ function showUI(active) {
   fpsBox.hidden = !active;
   testsBox.hidden = !active;
   settingsPanel.hidden = !active;
+  worldgenPanel.hidden = !active;
   builderToggle.hidden = !active;
   if (!active) builder.hidden = true;
   warnBox.hidden = !(active && fallbackActive);
