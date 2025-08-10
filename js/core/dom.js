@@ -27,11 +27,6 @@ const sunElevInp = document.getElementById('sunElev');
 const sunAziInp = document.getElementById('sunAzi');
 const sunColorInp = document.getElementById('sunColor');
 
-const worldgenPanel = document.getElementById('worldgen');
-const worldHandle = document.getElementById('worldHandle');
-const seedInp = document.getElementById('seed');
-const regenBtn = document.getElementById('regen');
-
 export {
   overlay,
   startBtn,
@@ -60,8 +55,4 @@ export {
   sunElevInp,
   sunAziInp,
   sunColorInp,
-  worldgenPanel,
-  worldHandle,
-  seedInp,
-  regenBtn,
 };

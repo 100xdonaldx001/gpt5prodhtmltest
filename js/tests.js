@@ -34,7 +34,6 @@ export function runTests() {
 
   assert('Settings handle exists', !!document.getElementById('settingsHandle'));
   assert('Builder handle exists', !!document.getElementById('builderHandle'));
-  assert('World gen handle exists', !!document.getElementById('worldHandle'));
 
   const res = assert.results;
   const summary = `Tests: ${res.pass} passed, ${res.fail} failed`;
