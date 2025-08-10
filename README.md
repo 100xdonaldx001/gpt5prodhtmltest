@@ -10,8 +10,6 @@ The project is a small 3D game experiment. GPT-5 was prompted with the following
 
 From this prompt, GPT-5 produced a basic world rendered through the browser, and Codex later helped refactor and organize the files.
 
-The project now defaults to Babylon.js with a procedurally generated terrain, but a toggle lets you switch back to the original Three.js renderer.
-
 Recent updates expand the terrain system with rivers, lakes, and oceans for a more lifelike landscape. An optional Terragen-style mode uses ridged multifractal noise to create sharper mountain ranges.
 
 ## Purpose
@@ -26,8 +24,7 @@ The repository demonstrates, in an approachable way, what it looks like to build
 
 - `index.html` – the original single-file game scaffold from GPT-5
 - `css/` – styling for the page
-- `babylon/js/` – Babylon renderer scripts
-- `three/js/` – original Three.js engine files
+- `js/` – scripts used to add interactivity
 
 ## Looking ahead
 
