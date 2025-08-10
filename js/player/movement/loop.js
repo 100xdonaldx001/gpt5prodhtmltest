@@ -55,12 +55,11 @@ function animate() {
     frames = 0;
     acc = 0;
   }
-  // Advance global time and update sun/lighting
+  // Advance time and drive a basic day/night cycle
   dayTime = (dayTime + delta * 0.01) % 1;
-  const sunElev = Math.sin(dayTime * Math.PI) * 45 + 5;
-  const sunAzi = dayTime * 360;
-  setSun(sunElev, sunAzi);
-  updateEnvironment(dayTime);
+  const sunElev = Math.sin(dayTime * Math.PI * 2) * 90;
+  setSun(sunElev, 0);
+  updateEnvironment(sunElev);
   updateChunks();
   // Only update player motion when enabled in the debug menu.
   if (state.isActive && (!window.__DEBUG || window.__DEBUG.movement)) {
