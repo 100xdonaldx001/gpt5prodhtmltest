@@ -121,4 +121,5 @@ function heightAt(x, z) {
     : basicHeightAt(x, z);
 }
 
-export { heightAt };
+// Export height function and noise so other modules (e.g., terrain coloring) can use them
+export { heightAt, fbm2D };

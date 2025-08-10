@@ -1,6 +1,6 @@
 import { THREE, scene } from '../core/environment.js';
 import { createTerrainMaterial } from '../core/shaders.js';
-import { heightAt } from './heightmap.js';
+import { heightAt, fbm2D } from './heightmap.js';
 
 // Water level for oceans, lakes, and rivers (default 130 units)
 let SEA_LEVEL = 130;
@@ -32,22 +32,61 @@ water.receiveShadow = true;
 scene.add(ground);
 scene.add(water);
 
+// Precompute colors used for terrain shading
+const waterFloorColor = new THREE.Color(0x5c6e7e); // grayish blue for seabeds
+const grassA = new THREE.Color(0x2e8f2e); // dark green
+const grassB = new THREE.Color(0x5cad49); // light green
+const stoneColor = new THREE.Color(0x777777); // gray for steep slopes
+const tmpColor = new THREE.Color(); // scratch color for interpolation
+
 let groundCenter = new THREE.Vector2(0, 0);
 function rebuildGround() {
   const pos = groundGeo.attributes.position;
+  let colorAttr = groundGeo.getAttribute('color');
+  // Ensure geometry has a color attribute for per-vertex shading
+  if (!colorAttr || colorAttr.count !== pos.count) {
+    const colors = new Float32Array(pos.count * 3);
+    groundGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    colorAttr = groundGeo.getAttribute('color');
+  }
+  const colors = colorAttr.array;
   let i = 0;
   for (let vi = 0; vi < pos.count; vi++) {
     const gx = pos.array[i];
     const gz = pos.array[i + 2];
     const wx = groundCenter.x + gx;
     const wz = groundCenter.y + gz;
-    pos.array[i + 1] = heightAt(wx, wz);
+    const h = heightAt(wx, wz); // height of current vertex
+    pos.array[i + 1] = h;
+
+    // Approximate slope using forward differences in X and Z directions
+    const hdx = heightAt(wx + GRID_STEP, wz);
+    const hdz = heightAt(wx, wz + GRID_STEP);
+    const slope = (Math.abs(h - hdx) + Math.abs(h - hdz)) / GRID_STEP;
+
+    if (h < SEA_LEVEL) {
+      // Sea floor takes on a muted blue color
+      colors[i] = waterFloorColor.r;
+      colors[i + 1] = waterFloorColor.g;
+      colors[i + 2] = waterFloorColor.b;
+    } else {
+      // Use smooth noise to vary green shades subtly across the land
+      const n = (fbm2D(wx * 0.05, wz * 0.05) + 1) / 2;
+      tmpColor.copy(grassA).lerp(grassB, n);
+      // Blend towards gray rock when slopes become steep
+      const rockMix = THREE.MathUtils.clamp((slope - 2) / 10, 0, 1);
+      tmpColor.lerp(stoneColor, rockMix);
+      colors[i] = tmpColor.r;
+      colors[i + 1] = tmpColor.g;
+      colors[i + 2] = tmpColor.b;
+    }
     i += 3;
   }
   pos.needsUpdate = true;
+  groundGeo.attributes.color.needsUpdate = true;
   groundGeo.computeVertexNormals();
   ground.position.set(groundCenter.x, 0, groundCenter.y);
-  // Recenter water plane so rivers and oceans follow the terrain.
+  // Recenter water plane so rivers and oceans follow the terrain
   water.position.set(groundCenter.x, SEA_LEVEL, groundCenter.y);
 }
 rebuildGround();
