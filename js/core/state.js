@@ -5,6 +5,7 @@ const state = {
   worldSeed: 1,
   mountainAmp: 240,
   valleyAmp: 20,
+  terrainType: 'basic',
 };
 
 // Update the global seed used for terrain and chunk generation.
@@ -18,4 +19,9 @@ function setTerrainAmps(mountain, valley) {
   state.valleyAmp = valley;
 }
 
-export { state, setWorldSeed, setTerrainAmps };
+// Select the terrain generation algorithm.
+function setTerrainType(type) {
+  state.terrainType = type;
+}
+
+export { state, setWorldSeed, setTerrainAmps, setTerrainType };

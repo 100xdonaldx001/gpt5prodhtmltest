@@ -3,6 +3,7 @@ import {
   regenBtn,
   mountainAmpInp,
   valleyAmpInp,
+  terrainTypeSel,
   rebuildGround,
   rebuildAABBs,
   updateChunks,
@@ -11,6 +12,7 @@ import {
   toggleProcgen,
   setWorldSeed,
   setTerrainAmps,
+  setTerrainType,
   controls,
   heightAt,
   SEA_LEVEL,
@@ -52,6 +54,9 @@ regenBtn.addEventListener('click', () => {
     valleyAmpInp.value = vAmp;
   }
   setTerrainAmps(mAmp, vAmp);
+  // Apply selected terrain type.
+  const tType = terrainTypeSel.value;
+  setTerrainType(tType);
   rebuildGround();
   rebuildAABBs();
   resetChunks();

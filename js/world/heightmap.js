@@ -63,8 +63,23 @@ function fbm2D(x, z) {
   return total / max;
 }
 
-// Height map producing smooth ground with mountains, valleys, and rivers.
-function heightAt(x, z) {
+// Ridged multifractal noise for sharp Terragen-style mountains.
+function ridgedFbm2D(x, z) {
+  let total = 0;
+  let amplitude = 0.5;
+  let frequency = 1;
+  for (let i = 0; i < 6; i++) {
+    let n = noise2D(x * frequency, z * frequency);
+    n = 1 - Math.abs(n); // invert valleys into ridges
+    total += n * n * amplitude;
+    amplitude *= 0.5;
+    frequency *= 2;
+  }
+  return total;
+}
+
+// Basic terrain with smooth mountains, valleys, and rivers.
+function basicHeightAt(x, z) {
   // Blend several noise layers for varied terrain features.
   const base = fbm2D(x * 0.01, z * 0.01); // medium-scale mountains
   const continent = fbm2D((x + 1000) * 0.002, (z + 1000) * 0.002); // large landmasses
@@ -78,6 +93,20 @@ function heightAt(x, z) {
   const river = Math.max(0, 0.02 - r) * 100;
   // Lower overall height to form oceans and lakes at sea level.
   return mountain + valley - river - 5;
+}
+
+// Terragen-like terrain using ridged noise for craggy peaks.
+function terragenHeightAt(x, z) {
+  const ridged = ridgedFbm2D(x * 0.01, z * 0.01);
+  const detail = fbm2D((x + 2000) * 0.03, (z + 2000) * 0.03) * 0.1;
+  return (ridged * 0.8 + detail) * state.mountainAmp - 5;
+}
+
+// Public height function selecting the active terrain algorithm.
+function heightAt(x, z) {
+  return state.terrainType === 'terragen'
+    ? terragenHeightAt(x, z)
+    : basicHeightAt(x, z);
 }
 
 export { heightAt };

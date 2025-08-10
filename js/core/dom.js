@@ -34,6 +34,7 @@ const seedInp = document.getElementById('seed');
 const regenBtn = document.getElementById('regen');
 const mountainAmpInp = document.getElementById('mountainAmp');
 const valleyAmpInp = document.getElementById('valleyAmp');
+const terrainTypeSel = document.getElementById('terrainType');
 
 const debugPanel = document.getElementById('debug');
 const debugHandle = document.getElementById('debugHandle');
@@ -76,6 +77,7 @@ export {
   regenBtn,
   mountainAmpInp,
   valleyAmpInp,
+  terrainTypeSel,
   debugPanel,
   debugHandle,
   dbgTests,
