@@ -2,7 +2,7 @@ import { THREE, controls } from './environment.js';
 import { chunksGroup, addBlockTo, rebuildAABBs } from './world.js';
 import { chunkSizeInp, viewDistInp } from './dom.js';
 import { state } from './state.js';
-import { setGroundSize } from './terrain.js';
+import { setGroundSize, heightAt, SEA_LEVEL } from './terrain.js';
 
 function mulberry32(a) {
   return function () {
@@ -40,7 +40,10 @@ function generateChunk(cx, cz) {
     const localZ = (rand() - 0.5) * (CHUNK_SIZE - 2);
     const worldX = cx * CHUNK_SIZE + localX;
     const worldZ = cz * CHUNK_SIZE + localZ;
-    const y = 0.2 + rand() * 2.0;
+    const terrainY = heightAt(worldX, worldZ);
+    // Skip placement if the location is underwater.
+    if (terrainY <= SEA_LEVEL) continue;
+    const y = terrainY + 0.2;
     const col = new THREE.Color().setHSL((rand() * 0.25 + 0.55) % 1, 0.55, 0.6).getHex();
     addBlockTo(g, worldX, y, worldZ, sx, sy, sz, col);
   }
@@ -80,14 +83,16 @@ function resetChunks() {
 
 let lastChunkUpdate = 0;
 function updateChunks(force = false, forcedPos = null) {
-  if (!PROC_ENABLED) return;
   const now = performance.now();
   if (!force && now - lastChunkUpdate < 250) return;
   lastChunkUpdate = now;
   CHUNK_SIZE = Math.max(8, parseInt(chunkSizeInp.value) || 32);
   VIEW_DIST = Math.max(1, Math.min(64, parseInt(viewDistInp.value) || 10));
-  // Sync ground plane to current view distance
+  // Always resize the ground to match the chosen view distance
   setGroundSize((VIEW_DIST * 2 + 2) * CHUNK_SIZE);
+
+  // Skip chunk generation when procedural objects are disabled
+  if (!PROC_ENABLED) return;
 
   const obj = controls.getObject();
   const px = forcedPos ? forcedPos.x : obj.position.x;
