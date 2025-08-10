@@ -16,10 +16,25 @@ blocks.add(chunksGroup);
 const userGroup = new THREE.Group();
 blocks.add(userGroup);
 
+// Cache box geometries by size so identical blocks reuse the same geometry
+const geometryCache = new Map();
+
+function cachedBoxGeometry(sx, sy, sz) {
+  const key = `${sx},${sy},${sz}`;
+  if (!geometryCache.has(key)) {
+    const geo = new THREE.BoxGeometry(sx, sy, sz);
+    // Precompute bounding box for collision checks
+    geo.computeBoundingBox();
+    geometryCache.set(key, geo);
+  }
+  return geometryCache.get(key);
+}
+
 function addBlockTo(group, x, y, z, sx = 1, sy = 1, sz = 1, color = 0x6ee7ff) {
-  // Use custom shader material for lighting and shadow support
+  // Use custom shader material and shared geometry for performance
   const mat = createBlockMaterial(color);
-  const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), mat);
+  const geo = cachedBoxGeometry(sx, sy, sz);
+  const m = new THREE.Mesh(geo, mat);
   m.position.set(x, y + sy / 2, z);
   m.castShadow = m.receiveShadow = true;
   m.updateMatrixWorld(true);
