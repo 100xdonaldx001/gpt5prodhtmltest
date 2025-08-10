@@ -107,6 +107,11 @@ window.addEventListener('mousedown', (e) => {
   }
 });
 
+window.addEventListener('contextmenu', (e) => {
+  // block context menu when right click toggles pointer lock
+  if (!fallbackActive) e.preventDefault();
+});
+
 controls.addEventListener('lock', () => {
   state.isActive = true;
   fallbackActive = false;
