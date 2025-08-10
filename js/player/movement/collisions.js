@@ -4,7 +4,8 @@ import movement from './state.js';
 function resolveHorizontalCollisions(pos3, feetY, headY) {
   const EPS = 1e-2;
   let collided = false;
-  for (const { box } of blockAABBs) {
+  for (const { box, isGround } of blockAABBs) {
+    if (isGround) continue; // Ground should not block horizontal motion
     if (feetY >= box.max.y - EPS || headY <= box.min.y + EPS) continue;
     const minX = box.min.x - movement.playerRadius,
       maxX = box.max.x + movement.playerRadius;
@@ -33,7 +34,8 @@ function resolveHorizontalCollisions(pos3, feetY, headY) {
 
 function hasHorizontalOverlap(pos3, feetY, headY) {
   const EPS = 1e-2;
-  for (const { box } of blockAABBs) {
+  for (const { box, isGround } of blockAABBs) {
+    if (isGround) continue; // Ignore ground for horizontal overlap
     if (feetY >= box.max.y - EPS || headY <= box.min.y + EPS) continue;
     const minX = box.min.x - movement.playerRadius,
       maxX = box.max.x + movement.playerRadius;
@@ -49,7 +51,8 @@ function attemptStepUp(obj) {
   const feetY = obj.position.y - movement.playerHeight;
   const maxStep = Math.max(0, movement.stepHeight);
   let bestTop = Infinity;
-  for (const { box } of blockAABBs) {
+  for (const { box, isGround } of blockAABBs) {
+    if (isGround) continue; // Ground doesn't prevent stepping
     const minX = box.min.x - movement.playerRadius,
       maxX = box.max.x + movement.playerRadius;
     const minZ = box.min.z - movement.playerRadius,
@@ -81,7 +84,8 @@ function attemptStepUpProbe(obj, dirWorld) {
   const ahead = obj.position.clone().addScaledVector(dirWorld.clone().normalize(), movement.playerRadius + 0.05);
   const feetY = obj.position.y - movement.playerHeight;
   let bestTop = Infinity;
-  for (const { box } of blockAABBs) {
+  for (const { box, isGround } of blockAABBs) {
+    if (isGround) continue; // Ignore ground for forward probe
     const minX = box.min.x - movement.playerRadius,
       maxX = box.max.x + movement.playerRadius;
     const minZ = box.min.z - movement.playerRadius,
