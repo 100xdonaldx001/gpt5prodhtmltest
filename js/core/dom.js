@@ -5,6 +5,7 @@ const crosshair = document.getElementById('crosshair');
 const fpsBox = document.getElementById('fps');
 const testsBox = document.getElementById('tests');
 const warnBox = document.getElementById('warn');
+const posBox = document.getElementById('pos');
 
 const settingsPanel = document.getElementById('settings');
 const settingsHandle = document.getElementById('settingsHandle');
@@ -42,6 +43,7 @@ export {
   hud,
   crosshair,
   fpsBox,
+  posBox,
   testsBox,
   warnBox,
   settingsPanel,
