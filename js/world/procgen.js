@@ -32,6 +32,7 @@ function generateChunk(cx, cz) {
   const seed = state.worldSeed ^ (cx * 73856093) ^ (cz * 19349663);
   const rand = mulberry32(seed >>> 0);
   const count = 12 + Math.floor(rand() * 10);
+  const color = new THREE.Color();
   for (let i = 0; i < count; i++) {
     const sx = 1 + Math.floor(rand() * 3);
     const sy = 0.6 + rand() * 1.8;
@@ -44,10 +45,10 @@ function generateChunk(cx, cz) {
     // Skip placement if the location is underwater.
     if (terrainY <= SEA_LEVEL) continue;
     const y = terrainY + 0.2;
-    const col = new THREE.Color().setHSL((rand() * 0.25 + 0.55) % 1, 0.55, 0.6).getHex();
+    color.setHSL((rand() * 0.25 + 0.55) % 1, 0.55, 0.6);
+    const col = color.getHex();
     addBlockTo(g, worldX, y, worldZ, sx, sy, sz, col);
   }
-  g.children.forEach((m) => m.updateMatrixWorld(true));
   chunksGroup.add(g);
   return g;
 }
@@ -62,13 +63,10 @@ function unloadChunk(cx, cz) {
   const k = key(cx, cz);
   const rec = loaded.get(k);
   if (!rec) return;
+  // Remove the chunk group and dispose of any unique textures
   chunksGroup.remove(rec.group);
   rec.group.traverse((o) => {
-    if (o.isMesh) {
-      o.geometry.dispose();
-      if (o.material.map) o.material.map.dispose();
-      o.material.dispose();
-    }
+    if (o.isMesh && o.material.map) o.material.map.dispose();
   });
   loaded.delete(k);
 }
