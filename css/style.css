@@ -36,11 +36,13 @@
     .panel .header { user-select: none; cursor: move; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.06); background: rgba(255,255,255,.04); border-top-left-radius: 12px; border-top-right-radius: 12px; }
     .panel .header .title { font-weight: 700; font-size: 12px; letter-spacing: .2px; opacity: .95; }
 
-    #settings { left: 12px; top: 12px; }
-    #builder { left: 12px; top: 200px; }
-    #worldgen { left: 12px; top: 388px; }
+/* Panel positions to prevent overlap */
+  #settings { left: 12px; top: 60px; }
+  #builder { left: 12px; top: 248px; }
+  #worldgen { left: 12px; top: 436px; }
+  #debug { left: 12px; top: 624px; }
 
-    #builderToggle { position: fixed; left: 12px; top: 12px; z-index: 6; padding: 6px 10px; font-size: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(90,200,250,.25); color: #eaf7ff; cursor: pointer; }
-    #builderToggle:hover { filter: brightness(1.05); }
+  #builderToggle { position: fixed; left: 12px; top: 12px; z-index: 6; padding: 6px 10px; font-size: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(90,200,250,.25); color: #eaf7ff; cursor: pointer; }
+  #builderToggle:hover { filter: brightness(1.05); }
   #procToggle { position: fixed; left: 132px; top: 12px; z-index: 6; padding: 6px 10px; font-size: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.15); background: rgba(90,200,250,.25); color: #eaf7ff; cursor: pointer; }
   #procToggle:hover { filter: brightness(1.05); }

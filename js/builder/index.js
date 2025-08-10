@@ -32,7 +32,8 @@ export function toggleBuilder() {
   setBuilderVisible(builder.hidden);
 }
 builderToggle.addEventListener('click', () => toggleBuilder());
-setBuilderVisible(true);
+// Disable builder by default so the world starts without the editor
+setBuilderVisible(false);
 
 function addAABBForMesh(mesh) {
   mesh.updateMatrixWorld(true);
