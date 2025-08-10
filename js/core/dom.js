@@ -23,6 +23,9 @@ const jumpInp = document.getElementById('jump');
 const stepHInp = document.getElementById('stepH');
 const viewDistInp = document.getElementById('viewDist');
 const chunkSizeInp = document.getElementById('chunkSize');
+const sunElevInp = document.getElementById('sunElev');
+const sunAziInp = document.getElementById('sunAzi');
+const sunColorInp = document.getElementById('sunColor');
 
 export {
   overlay,
@@ -49,4 +52,7 @@ export {
   stepHInp,
   viewDistInp,
   chunkSizeInp,
+  sunElevInp,
+  sunAziInp,
+  sunColorInp,
 };
