@@ -22,7 +22,7 @@ export {
   blockAABBs,
   rebuildAABBs,
 } from './world.js';
-export { updateChunks, worldToChunk, resetChunks } from './procgen.js';
+export { updateChunks, worldToChunk, resetChunks, toggleProcgen } from './procgen.js';
 export {
   overlay,
   startBtn,
@@ -36,6 +36,7 @@ export {
   builder,
   builderHandle,
   builderToggle,
+  procToggle,
   shapeSel,
   colorInp,
   sxInp,

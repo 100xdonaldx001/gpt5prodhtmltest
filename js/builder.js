@@ -17,6 +17,7 @@ import {
   userGroup,
   blockAABBs,
   rebuildAABBs,
+  resetChunks,
   state,
 } from './core/index.js';
 
@@ -136,6 +137,8 @@ function spawnAtPreview() {
 // Remove all user-placed blocks and refresh collision boxes.
 function clearUserBlocks() {
   userGroup.clear();
+  // Also remove procedurally generated blocks
+  resetChunks();
   rebuildAABBs();
 }
 

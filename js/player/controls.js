@@ -12,6 +12,7 @@ import {
   settingsPanel,
   builder,
   builderToggle,
+  procToggle,
   worldgenPanel,
   state,
 } from '../core/index.js';
@@ -29,6 +30,7 @@ function showUI(active) {
   settingsPanel.hidden = !active;
   worldgenPanel.hidden = !active;
   builderToggle.hidden = !active;
+  procToggle.hidden = !active;
   if (!active) builder.hidden = true;
   warnBox.hidden = !(active && fallbackActive);
 }
