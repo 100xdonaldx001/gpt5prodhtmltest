@@ -58,7 +58,9 @@ function animate() {
   // Advance time and drive a basic day/night cycle
   dayTime = (dayTime + delta * 0.01) % 1;
   const sunElev = Math.sin(dayTime * Math.PI * 2) * 90;
-  setSun(sunElev, 0);
+  // Rotate the sun around the player for a full 360° cycle
+  const sunAz = dayTime * 360;
+  setSun(sunElev, sunAz);
   updateEnvironment(sunElev);
   updateChunks();
   // Only update player motion when enabled in the debug menu.
