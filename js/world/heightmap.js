@@ -65,8 +65,11 @@ function fbm2D(x, z) {
 
 // Height map producing smooth ground with mountains, valleys, and rivers.
 function heightAt(x, z) {
-  // Increase noise frequency so mountains are packed closer together.
-  const n = fbm2D(x * 0.01, z * 0.01);
+  // Blend several noise layers for varied terrain features.
+  const base = fbm2D(x * 0.01, z * 0.01); // medium-scale mountains
+  const continent = fbm2D((x + 1000) * 0.002, (z + 1000) * 0.002); // large landmasses
+  const detail = fbm2D((x - 1000) * 0.05, (z - 1000) * 0.05) * 0.1; // fine detail
+  const n = base * 0.6 + continent * 0.3 + detail; // combine noise layers
   // Amplify heights using configurable mountain and valley factors.
   const mountain = Math.pow(Math.max(0, n), 3) * state.mountainAmp;
   const valley = -Math.pow(Math.max(0, -n), 2) * state.valleyAmp;
