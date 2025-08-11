@@ -27,7 +27,21 @@ ground.castShadow = ground.receiveShadow = true;
 // Flat water plane that fills low-lying terrain
 let waterGeo = new THREE.PlaneGeometry(groundSize, groundSize, 1, 1);
 waterGeo.rotateX(-Math.PI / 2);
+// Start from a standard material so lighting and reflections stay intact
 const waterMat = new THREE.MeshStandardMaterial({ color: 0x1e90ff, transparent: true, opacity: 0.6 });
+// Inject a simple wave shader that displaces vertices over time
+waterMat.onBeforeCompile = (shader) => {
+  shader.uniforms.uTime = { value: 0 };
+  shader.vertexShader = shader.vertexShader.replace(
+    '#include <common>',
+    '#include <common>\nuniform float uTime;'
+  );
+  shader.vertexShader = shader.vertexShader.replace(
+    '#include <begin_vertex>',
+    '#include <begin_vertex>\n  transformed.y += (sin((position.x + uTime) * 0.1) + sin((position.z + uTime) * 0.1)) * 0.5;'
+  );
+  waterMat.userData.shader = shader;
+};
 const water = new THREE.Mesh(waterGeo, waterMat);
 // Let water reflect light but not cast shadows
 water.receiveShadow = true;
