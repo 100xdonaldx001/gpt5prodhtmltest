@@ -142,24 +142,29 @@ function animate() {
     }
     const recenter = maybeRecenterGround(obj.position.x, obj.position.z);
     if (recenter.shifted) rebuildAABBs();
-    const dist = 100;
+    const sunDist = 100; // Keep the sun light close for stable shadows
+    const moonDist = 1000; // Place the moon far so it doesn't rise from the ground
     sunLight.position.set(
-      obj.position.x + sunDir.x * dist,
-      obj.position.y + sunDir.y * dist,
-      obj.position.z + sunDir.z * dist
+      obj.position.x + sunDir.x * sunDist,
+      obj.position.y + sunDir.y * sunDist,
+      obj.position.z + sunDir.z * sunDist
     );
     sunLight.target.position.copy(obj.position);
     sunLight.target.updateMatrixWorld();
-    // Position the moon opposite the sun; intensity remains fixed
+    // Position the moon light opposite the sun but keep it near for shadows
     moonLight.position.set(
-      obj.position.x - sunDir.x * dist,
-      obj.position.y - sunDir.y * dist,
-      obj.position.z - sunDir.z * dist
+      obj.position.x - sunDir.x * sunDist,
+      obj.position.y - sunDir.y * sunDist,
+      obj.position.z - sunDir.z * sunDist
     );
     moonLight.target.position.copy(obj.position);
     moonLight.target.updateMatrixWorld();
-    // Keep the visible moon mesh aligned with the light
-    moon.position.copy(moonLight.position);
+    // Place the visible moon mesh farther away to avoid popping up at the player
+    moon.position.set(
+      obj.position.x - sunDir.x * moonDist,
+      obj.position.y - sunDir.y * moonDist,
+      obj.position.z - sunDir.z * moonDist
+    );
     sky.position.copy(obj.position);
     // Show current player position in the HUD
     posBox.textContent =
