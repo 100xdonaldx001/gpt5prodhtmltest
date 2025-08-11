@@ -1,5 +1,6 @@
 import { THREE, scene, camera, renderer } from '../core/environment.js';
-import { BufferGeometryUtils } from 'three/addons/utils/BufferGeometryUtils.js';
+// Import the utility functions for merging geometries
+import { mergeBufferGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 // Tile size in world units
 const TILE_SIZE = 64;
@@ -196,7 +197,8 @@ function populateVegetation(){
 function finalizeStatic(){
   const meshes = [];
   scene.traverse((o)=>{ if(o.isMesh && o !== vegetation) meshes.push(o); });
-  const merged = BufferGeometryUtils.mergeBufferGeometries(meshes.map(m=>m.geometry));
+  // Combine all collected geometries into a single mesh for better performance
+  const merged = mergeBufferGeometries(meshes.map(m=>m.geometry));
   const finalMesh = new THREE.Mesh(merged, terrainMaterial);
   finalMesh.matrixAutoUpdate = false;
   scene.add(finalMesh);
