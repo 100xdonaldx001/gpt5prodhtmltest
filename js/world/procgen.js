@@ -21,6 +21,10 @@ let VIEW_DIST = 5;
 // Precomputed LOD thresholds in chunk units with smaller increments
 let LOD_RANGES = [5, 7.5, 10, 12.5];
 
+// Track previous input values to avoid redundant recalculations
+let prevChunkSize = null;
+let prevViewDist = null;
+
 function key(cx, cz) {
   return cx + ',' + cz;
 }
@@ -96,14 +100,21 @@ function updateChunks(force = false, forcedPos = null) {
   const now = performance.now();
   if (!force && now - lastChunkUpdate < 250) return;
   lastChunkUpdate = now;
-  CHUNK_SIZE = Math.max(8, parseInt(chunkSizeInp.value) || 32);
-  VIEW_DIST = Math.max(1, Math.min(64, parseInt(viewDistInp.value) || 10));
-  // Define four LOD bands with smaller incremental steps
-  LOD_RANGES = [VIEW_DIST, VIEW_DIST * 1.5, VIEW_DIST * 2, VIEW_DIST * 2.5];
-  // Resize ground to cover the most distant LOD ring
-  setGroundSize((LOD_RANGES[3] * 2 + 2) * CHUNK_SIZE);
-  // Update collision data for resized terrain
-  rebuildAABBs();
+  // Read current inputs and update world metrics only if values changed
+  const newChunkSize = Math.max(8, parseInt(chunkSizeInp.value) || 32);
+  const newViewDist = Math.max(1, Math.min(64, parseInt(viewDistInp.value) || 10));
+  if (newChunkSize !== prevChunkSize || newViewDist !== prevViewDist) {
+    CHUNK_SIZE = newChunkSize;
+    VIEW_DIST = newViewDist;
+    // Define four LOD bands with smaller incremental steps
+    LOD_RANGES = [VIEW_DIST, VIEW_DIST * 1.5, VIEW_DIST * 2, VIEW_DIST * 2.5];
+    // Resize ground to cover the most distant LOD ring
+    setGroundSize((LOD_RANGES[3] * 2 + 2) * CHUNK_SIZE);
+    // Update collision data for resized terrain
+    rebuildAABBs();
+    prevChunkSize = newChunkSize;
+    prevViewDist = newViewDist;
+  }
 
   // Skip chunk generation when procedural objects are disabled
   if (!PROC_ENABLED) return;
