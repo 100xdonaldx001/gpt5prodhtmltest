@@ -38,11 +38,13 @@ scene.add(water);
 // Options controlling base colors and slope thresholds for shading
 const defaultTerrainOpts = {
   waterFloorColor: new THREE.Color(0x5c6e7e), // grayish blue for seabeds
+  sandColor: new THREE.Color(0xc2b280), // pale yellow for beaches
   grassA: new THREE.Color(0x2e8f2e), // dark green
   grassB: new THREE.Color(0x5cad49), // light green
   stoneColor: new THREE.Color(0x777777), // gray for steep slopes
   rockSlopeStart: 2, // slope value where rocks begin to appear
   rockSlopeRange: 10, // additional slope needed to become full rock
+  beachHeight: 3, // vertical range above water that counts as beach
 };
 let terrainOpts = { ...defaultTerrainOpts };
 const tmpColor = new THREE.Color(); // scratch color for interpolation
@@ -87,11 +89,13 @@ function clearCaches() {
 // Update terrain color and slope settings
 function setTerrainOptions(opts = {}) {
   if (opts.waterFloorColor) terrainOpts.waterFloorColor.set(opts.waterFloorColor);
+  if (opts.sandColor) terrainOpts.sandColor.set(opts.sandColor);
   if (opts.grassA) terrainOpts.grassA.set(opts.grassA);
   if (opts.grassB) terrainOpts.grassB.set(opts.grassB);
   if (opts.stoneColor) terrainOpts.stoneColor.set(opts.stoneColor);
   if (typeof opts.rockSlopeStart === 'number') terrainOpts.rockSlopeStart = opts.rockSlopeStart;
   if (typeof opts.rockSlopeRange === 'number') terrainOpts.rockSlopeRange = opts.rockSlopeRange;
+  if (typeof opts.beachHeight === 'number') terrainOpts.beachHeight = opts.beachHeight;
   // Changing options can influence shading so invalidate cached samples
   clearCaches();
 }
@@ -100,11 +104,13 @@ function setTerrainOptions(opts = {}) {
 function getTerrainOptions() {
   return {
     waterFloorColor: terrainOpts.waterFloorColor.clone(),
+    sandColor: terrainOpts.sandColor.clone(),
     grassA: terrainOpts.grassA.clone(),
     grassB: terrainOpts.grassB.clone(),
     stoneColor: terrainOpts.stoneColor.clone(),
     rockSlopeStart: terrainOpts.rockSlopeStart,
     rockSlopeRange: terrainOpts.rockSlopeRange,
+    beachHeight: terrainOpts.beachHeight,
   };
 }
 
@@ -138,6 +144,15 @@ function rebuildGround() {
       colors[i] = terrainOpts.waterFloorColor.r;
       colors[i + 1] = terrainOpts.waterFloorColor.g;
       colors[i + 2] = terrainOpts.waterFloorColor.b;
+    } else if (h < SEA_LEVEL + terrainOpts.beachHeight) {
+      // Light sandy strip just above water for beaches
+      const n = (cachedFbm2D(wx * 0.1, wz * 0.1) + 1) / 2;
+      tmpColor.copy(terrainOpts.sandColor);
+      // Subtle brightness variation to mimic textured sand
+      tmpColor.offsetHSL(0, 0, (n - 0.5) * 0.2);
+      colors[i] = tmpColor.r;
+      colors[i + 1] = tmpColor.g;
+      colors[i + 2] = tmpColor.b;
     } else {
       // Use smooth noise to vary green shades subtly across the land
       const n = (cachedFbm2D(wx * 0.05, wz * 0.05) + 1) / 2;

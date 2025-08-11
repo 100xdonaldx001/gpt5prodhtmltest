@@ -10,7 +10,7 @@ The project is a small 3D game experiment. GPT-5 was prompted with the following
 
 From this prompt, GPT-5 produced a basic world rendered through the browser, and Codex later helped refactor and organize the files.
 
-Recent updates expand the terrain system with rivers, lakes, and oceans for a more lifelike landscape. An optional Terragen-style mode uses ridged multifractal noise to create sharper mountain ranges.
+Recent updates expand the terrain system with rivers, lakes, and oceans for a more lifelike landscape. Sandy beaches now ring the shoreline, and an optional Terragen-style mode uses ridged multifractal noise to create sharper mountain ranges.
 
 ## Purpose
 
