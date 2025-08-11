@@ -7,6 +7,8 @@ import {
   worldHandle,
   debugPanel,
   debugHandle,
+  setWeather,
+  getWeather,
 } from './core/index.js';
 
 function constrainPanel(panel) {
@@ -76,6 +78,26 @@ makeDraggable(settingsPanel, settingsHandle, 'ui.settings.pos');
 makeDraggable(builder, builderHandle, 'ui.builder.pos');
 makeDraggable(worldgenPanel, worldHandle, 'ui.worldgen.pos');
 makeDraggable(debugPanel, debugHandle, 'ui.debug.pos');
+
+// Dropdown in settings panel to switch weather states
+const weatherRow = document.createElement('div');
+weatherRow.className = 'row';
+const weatherLabel = document.createElement('label');
+weatherLabel.textContent = 'Weather';
+weatherLabel.setAttribute('for', 'weather');
+const weatherSel = document.createElement('select');
+weatherSel.id = 'weather';
+['clear', 'rain', 'snow'].forEach((w) => {
+  const o = document.createElement('option');
+  o.value = w;
+  o.textContent = w.charAt(0).toUpperCase() + w.slice(1);
+  weatherSel.appendChild(o);
+});
+weatherRow.appendChild(weatherLabel);
+weatherRow.appendChild(weatherSel);
+settingsPanel.querySelector('.panel-body').appendChild(weatherRow);
+weatherSel.value = getWeather();
+weatherSel.addEventListener('change', () => setWeather(weatherSel.value));
 
 // Set default positions so panels don't overlap on first load
 if (!localStorage.getItem('ui.settings.pos')) {

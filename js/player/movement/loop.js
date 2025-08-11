@@ -31,6 +31,7 @@ import {
   maybeRecenterGround,
   rebuildAABBs,
   updateEnvironment,
+  updateWeather,
   alignPlayerToGround,
 } from '../../core/index.js';
 import { constrainPanel } from '../../ui.js';
@@ -189,6 +190,7 @@ function animate() {
     acc = 0;
   }
   updateDayNightCycle(delta);
+  updateWeather(delta);
   updateChunks();
   updateTerrainChunks();
   updateHeightTexture(new THREE.Vector2(camera.position.x, camera.position.z));
