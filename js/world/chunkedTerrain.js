@@ -28,6 +28,8 @@ const heightMaterial = new THREE.ShaderMaterial({
     }
   `,
   fragmentShader: `
+    uniform vec2 uOffset;   // Offset for noise lookup
+    uniform float uScale;   // Scale of noise sampling
     // 2D OpenSimplex noise adapted for GLSL
     vec3 mod289(vec3 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
     vec2 mod289(vec2 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
