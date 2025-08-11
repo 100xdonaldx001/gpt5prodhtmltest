@@ -2,6 +2,7 @@ import { THREE, scene, camera, renderer } from '../core/environment.js';
 // Import the utility functions for merging geometries
 import { mergeBufferGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { spawnCreatures } from './creatures/index.js';
 
 // Tile size in world units
 const TILE_SIZE = 64;
@@ -281,6 +282,8 @@ function populateVegetation(){
     mesh.instanceColor.needsUpdate = true;
     mesh.frustumCulled = false;
   });
+  // Populate basic creatures alongside vegetation
+  spawnCreatures();
 }
 
 // Merge static meshes and freeze materials for performance

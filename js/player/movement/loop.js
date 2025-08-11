@@ -28,6 +28,7 @@ import {
   updateTerrainChunks,
   updateHeightTexture,
   populateVegetation,
+  updateCreatures,
   maybeRecenterGround,
   rebuildAABBs,
   updateEnvironment,
@@ -194,6 +195,8 @@ function animate() {
   updateChunks();
   updateTerrainChunks();
   updateHeightTexture(new THREE.Vector2(camera.position.x, camera.position.z));
+  updateCreatures(delta);
+  
   // Drive water wave animation by advancing the time uniform
   if (water.material.userData.shader) {
     water.material.userData.shader.uniforms.uTime.value += delta;
