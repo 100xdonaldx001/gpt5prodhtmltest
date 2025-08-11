@@ -2,6 +2,7 @@ import { THREE, scene, camera, renderer } from '../core/environment.js';
 // Import the utility functions for merging geometries
 import { mergeBufferGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { heightAt, SEA_LEVEL } from './terrain.js';
 import { spawnCreatures } from './creatures/index.js';
 
 // Tile size in world units
@@ -200,61 +201,6 @@ vegetationModelPaths.forEach(url => {
   });
 });
 
-// Utility functions for CPU-side 2D simplex noise matching the shader noise
-function mod289(x){
-  return x - Math.floor(x / 289) * 289;
-}
-function permute(x){
-  return mod289(((x * 34) + 1) * x);
-}
-function snoise2D(x, y){
-  const Cx = 0.211324865405187; // (3 - sqrt(3)) / 6
-  const Cy = 0.366025403784439; // 0.5 * (sqrt(3) - 1)
-  const Cz = -0.577350269189626; // -1 + 2 * Cx
-  const Cw = 0.024390243902439; // 1 / 41
-  // Skew input space to determine simplex cell
-  let i = Math.floor(x + (x + y) * Cy);
-  let j = Math.floor(y + (x + y) * Cy);
-  const x0 = x - i + (i + j) * Cx;
-  const y0 = y - j + (i + j) * Cx;
-  // Determine which simplex corner is visited second
-  const i1 = x0 > y0 ? 1 : 0;
-  const j1 = x0 > y0 ? 0 : 1;
-  const x1 = x0 - i1 + Cx;
-  const y1 = y0 - j1 + Cx;
-  const x2 = x0 + Cz;
-  const y2 = y0 + Cz;
-  // Hash coordinates of the three simplex corners
-  i = mod289(i);
-  j = mod289(j);
-  const p0 = permute(permute(j) + i);
-  const p1 = permute(permute(j + j1) + i + i1);
-  const p2 = permute(permute(j + 1) + i + 1);
-  // Compute the contribution from the three corners
-  const m0 = Math.max(0.5 - x0 * x0 - y0 * y0, 0);
-  const m1 = Math.max(0.5 - x1 * x1 - y1 * y1, 0);
-  const m2 = Math.max(0.5 - x2 * x2 - y2 * y2, 0);
-  const m = [m0 * m0 * m0 * m0, m1 * m1 * m1 * m1, m2 * m2 * m2 * m2];
-  const xVals = [p0, p1, p2].map(v => 2 * ((v * Cw) % 1) - 1);
-  const h = xVals.map(v => Math.abs(v) - 0.5);
-  const ox = xVals.map(v => Math.floor(v + 0.5));
-  const a0 = xVals.map((v, idx) => v - ox[idx]);
-  for(let idx=0; idx<3; idx++){
-    m[idx] *= 1.79284291400159 - 0.85373472095314 * (a0[idx]*a0[idx] + h[idx]*h[idx]);
-  }
-  const g0 = a0[0] * x0 + h[0] * y0;
-  const g1 = a0[1] * x1 + h[1] * y1;
-  const g2 = a0[2] * x2 + h[2] * y2;
-  return 130 * (m[0] * g0 + m[1] * g1 + m[2] * g2);
-}
-
-// Sample the noise at world coordinates to place vegetation on terrain
-function getTerrainHeight(x, z){
-  const scale = 0.005; // Same scale as height shader
-  const h = snoise2D(x * scale, z * scale);
-  return h * (TILE_SIZE / 256.0);
-}
-
 function populateVegetation(){
   if (vegetationMeshes.length === 0) return; // Models not yet loaded
   const dummy = new THREE.Object3D();
@@ -265,7 +211,10 @@ function populateVegetation(){
     const idx = used[meshIndex];
     const x = (Math.random() - 0.5) * 1000;
     const z = (Math.random() - 0.5) * 1000;
-    dummy.position.set(x, getTerrainHeight(x, z), z);
+    // Use terrain height so vegetation sits on the ground
+    const y = heightAt(x, z);
+    if (y <= SEA_LEVEL) continue; // Skip underwater placements
+    dummy.position.set(x, y, z);
     dummy.rotation.y = Math.random() * Math.PI * 2;
     const s = 0.5 + Math.random();
     dummy.scale.set(s, s, s);
