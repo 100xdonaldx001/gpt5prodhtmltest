@@ -11,6 +11,7 @@ import {
   sunDir,
   sky,
   ground,
+  water,
   blocks,
   fpsBox,
   posBox,
@@ -31,6 +32,7 @@ import {
   maybeRecenterGround,
   rebuildAABBs,
   updateEnvironment,
+  updateWeather,
   alignPlayerToGround,
 } from '../../core/index.js';
 import { constrainPanel } from '../../ui.js';
@@ -189,10 +191,15 @@ function animate() {
     acc = 0;
   }
   updateDayNightCycle(delta);
+  updateWeather(delta);
   updateChunks();
   updateTerrainChunks();
   updateHeightTexture(new THREE.Vector2(camera.position.x, camera.position.z));
   updateCreatures(delta);
+  // Drive water wave animation by advancing the time uniform
+  if (water.material.userData.shader) {
+    water.material.userData.shader.uniforms.uTime.value += delta;
+  }
   if (state.isActive && (!window.__DEBUG || window.__DEBUG.movement)) {
     const obj = updatePlayerMovement(delta);
     updateLighting(obj);

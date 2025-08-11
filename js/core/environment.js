@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 import { Sky } from 'three/addons/objects/Sky.js';
+import { initWeather, getWeather } from './weather.js';
 
 // Scene and camera
 const scene = new THREE.Scene();
@@ -62,6 +63,20 @@ function updateEnvironment(elevation) {
   sunLight.color.copy(sunCol);
   sunLight.intensity = 0.2 + 0.8 * t;
   hemi.intensity = 0.1 + 0.9 * t;
+  const weather = getWeather();
+  if (weather === 'rain') {
+    sunLight.intensity *= 0.6;
+    hemi.intensity *= 0.7;
+    const rainFog = bg.clone().lerp(new THREE.Color(0x555555), 0.3);
+    scene.background.copy(rainFog);
+    scene.fog.color.copy(rainFog);
+  } else if (weather === 'snow') {
+    sunLight.intensity *= 0.8;
+    hemi.intensity *= 0.8;
+    const snowFog = bg.clone().lerp(new THREE.Color(0xffffff), 0.5);
+    scene.background.copy(snowFog);
+    scene.fog.color.copy(snowFog);
+  }
 }
 
 // Lights
@@ -103,6 +118,7 @@ scene.add(moon);
 // Controls
 const controls = new PointerLockControls(camera, document.body);
 scene.add(controls.getObject());
+initWeather(scene);
 
 export {
   THREE,
