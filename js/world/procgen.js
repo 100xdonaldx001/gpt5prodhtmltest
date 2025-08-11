@@ -4,6 +4,7 @@ import { chunkSizeInp, viewDistInp } from '../core/dom.js';
 import { state } from '../core/state.js';
 import { setGroundSize, heightAt, SEA_LEVEL } from './terrain.js';
 
+// Deterministic pseudo-random number generator used for chunk decoration
 function mulberry32(a) {
   return function () {
     let t = (a += 0x6d2b79f5);
@@ -13,6 +14,7 @@ function mulberry32(a) {
   };
 }
 
+// Tracks all loaded chunk groups keyed by their coordinates
 const loaded = new Map();
 // Disable procedural object generation by default
 let PROC_ENABLED = false;
@@ -21,9 +23,11 @@ let VIEW_DIST = 5;
 // Precomputed LOD thresholds in chunk units with smaller increments
 let LOD_RANGES = [5, 7.5, 10, 12.5];
 
+// Convert chunk coordinates to a unique string key
 function key(cx, cz) {
   return cx + ',' + cz;
 }
+// Convert world-space position to chunk coordinates
 function worldToChunk(x, z) {
   return [Math.floor(x / CHUNK_SIZE), Math.floor(z / CHUNK_SIZE)];
 }
@@ -57,7 +61,7 @@ function generateChunk(cx, cz, lod) {
   return g;
 }
 
-// Load a chunk at a specific LOD level
+// Ensure a chunk at a specific LOD is present in the scene
 function loadChunk(cx, cz, lod) {
   const k = key(cx, cz);
   const rec = loaded.get(k);
@@ -66,6 +70,7 @@ function loadChunk(cx, cz, lod) {
   const g = generateChunk(cx, cz, lod);
   loaded.set(k, { group: g, lod });
 }
+// Remove a chunk and dispose of its resources
 function unloadChunk(cx, cz) {
   const k = key(cx, cz);
   const rec = loaded.get(k);
@@ -81,7 +86,7 @@ function unloadChunk(cx, cz) {
   loaded.delete(k);
 }
 
-// Remove all loaded chunks so a new seed can regenerate the world.
+// Remove all loaded chunks so a new seed can regenerate the world
 function resetChunks() {
   for (const k of Array.from(loaded.keys())) {
     const [cx, cz] = k.split(',').map(Number);
@@ -90,6 +95,7 @@ function resetChunks() {
 }
 
 let lastChunkUpdate = 0;
+// Periodically determine which chunks surround the player and load/unload them
 function updateChunks(force = false, forcedPos = null) {
   // Skip updates when ground generation is disabled via debug menu.
   if (window.__DEBUG && !window.__DEBUG.ground) return;
@@ -142,8 +148,8 @@ function updateChunks(force = false, forcedPos = null) {
 window.__forceChunkUpdate = (x, z) => updateChunks(true, new THREE.Vector3(x, 0, z));
 updateChunks(true, new THREE.Vector3(0, 0, 0));
 
+// Toggle procedural generation and rebuild or clear chunks
 function toggleProcgen() {
-  // Toggle procedural generation and rebuild or clear chunks
   PROC_ENABLED = !PROC_ENABLED;
   if (!PROC_ENABLED) {
     resetChunks();
