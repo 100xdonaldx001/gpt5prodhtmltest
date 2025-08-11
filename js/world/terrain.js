@@ -1,6 +1,6 @@
 import { THREE, scene } from '../core/environment.js';
 import { createTerrainMaterial } from '../core/shaders.js';
-import { heightAt, fbm2D } from './heightmap.js';
+import { heightAt as baseHeightAt, fbm2D as baseFbm2D } from './heightmap.js';
 
 // Water level for oceans, lakes, and rivers (default 130 units)
 let SEA_LEVEL = 130;
@@ -44,6 +44,43 @@ const defaultTerrainOpts = {
 let terrainOpts = { ...defaultTerrainOpts };
 const tmpColor = new THREE.Color(); // scratch color for interpolation
 
+// Cache height and noise samples to avoid redundant calculations
+const heightCache = new Map();
+const fbmCache = new Map();
+
+// Build a string key from world coordinates
+function cacheKey(x, z) {
+  return `${x},${z}`;
+}
+
+// Retrieve a cached height value or compute and store it
+function cachedHeightAt(x, z) {
+  const key = cacheKey(x, z);
+  let h = heightCache.get(key);
+  if (h === undefined) {
+    h = baseHeightAt(x, z);
+    heightCache.set(key, h);
+  }
+  return h;
+}
+
+// Retrieve a cached fbm value or compute and store it
+function cachedFbm2D(x, z) {
+  const key = cacheKey(x, z);
+  let n = fbmCache.get(key);
+  if (n === undefined) {
+    n = baseFbm2D(x, z);
+    fbmCache.set(key, n);
+  }
+  return n;
+}
+
+// Clear caches when terrain origin or appearance changes
+function clearCaches() {
+  heightCache.clear();
+  fbmCache.clear();
+}
+
 // Update terrain color and slope settings
 function setTerrainOptions(opts = {}) {
   if (opts.waterFloorColor) terrainOpts.waterFloorColor.set(opts.waterFloorColor);
@@ -52,6 +89,8 @@ function setTerrainOptions(opts = {}) {
   if (opts.stoneColor) terrainOpts.stoneColor.set(opts.stoneColor);
   if (typeof opts.rockSlopeStart === 'number') terrainOpts.rockSlopeStart = opts.rockSlopeStart;
   if (typeof opts.rockSlopeRange === 'number') terrainOpts.rockSlopeRange = opts.rockSlopeRange;
+  // Changing options can influence shading so invalidate cached samples
+  clearCaches();
 }
 
 // Return a copy of current terrain options
@@ -83,12 +122,12 @@ function rebuildGround() {
     const gz = pos.array[i + 2];
     const wx = groundCenter.x + gx;
     const wz = groundCenter.y + gz;
-    const h = heightAt(wx, wz); // height of current vertex
+    const h = cachedHeightAt(wx, wz); // height of current vertex
     pos.array[i + 1] = h;
 
     // Approximate slope using forward differences in X and Z directions
-    const hdx = heightAt(wx + GRID_STEP, wz);
-    const hdz = heightAt(wx, wz + GRID_STEP);
+    const hdx = cachedHeightAt(wx + GRID_STEP, wz);
+    const hdz = cachedHeightAt(wx, wz + GRID_STEP);
     const slope = (Math.abs(h - hdx) + Math.abs(h - hdz)) / GRID_STEP;
 
     if (h < SEA_LEVEL) {
@@ -98,7 +137,7 @@ function rebuildGround() {
       colors[i + 2] = terrainOpts.waterFloorColor.b;
     } else {
       // Use smooth noise to vary green shades subtly across the land
-      const n = (fbm2D(wx * 0.05, wz * 0.05) + 1) / 2;
+      const n = (cachedFbm2D(wx * 0.05, wz * 0.05) + 1) / 2;
       tmpColor.copy(terrainOpts.grassA).lerp(terrainOpts.grassB, n);
       // Blend towards gray rock when slopes become steep
       const rockMix = THREE.MathUtils.clamp(
@@ -151,6 +190,8 @@ function maybeRecenterGround(playerX, playerZ) {
   if (shiftX || shiftZ) {
     groundCenter.x += shiftX;
     groundCenter.y += shiftZ;
+    // Origin shifted, so cached samples no longer align
+    clearCaches();
     rebuildGround();
     // Return the applied shift so other world elements can follow.
     return { shifted: true, dx: shiftX, dz: shiftZ };
@@ -169,7 +210,7 @@ export {
   ground,
   water,
   SEA_LEVEL,
-  heightAt,
+  baseHeightAt as heightAt,
   maybeRecenterGround,
   rebuildGround,
   setGroundSize,
