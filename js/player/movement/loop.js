@@ -27,6 +27,7 @@ import {
   updateTerrainChunks,
   updateHeightTexture,
   populateVegetation,
+  updateCreatures,
   maybeRecenterGround,
   rebuildAABBs,
   updateEnvironment,
@@ -191,6 +192,7 @@ function animate() {
   updateChunks();
   updateTerrainChunks();
   updateHeightTexture(new THREE.Vector2(camera.position.x, camera.position.z));
+  updateCreatures(delta);
   if (state.isActive && (!window.__DEBUG || window.__DEBUG.movement)) {
     const obj = updatePlayerMovement(delta);
     updateLighting(obj);
