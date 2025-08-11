@@ -1,6 +1,7 @@
 import { THREE, scene, camera, renderer } from '../core/environment.js';
 // Import the utility functions for merging geometries
 import { mergeBufferGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Tile size in world units
 const TILE_SIZE = 64;
@@ -173,14 +174,30 @@ const fullscreenScene = new THREE.Scene();
 const fullscreenCamera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
 fullscreenScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), heightMaterial));
 
-// Instanced mesh for vegetation
-const vegetation = new THREE.InstancedMesh(
-  new THREE.ConeGeometry(0.5, 2, 5),
-  new THREE.MeshStandardMaterial({ color: 0x228822 }),
-  2000
-);
-vegetation.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-scene.add(vegetation);
+// Load tree and shrub models for instanced vegetation
+const loader = new GLTFLoader();
+const VEGETATION_COUNT = 2000;
+const vegetationMeshes = [];
+const vegetationModelPaths = [
+  'models/tree.gltf',
+  'models/shrub.gltf'
+];
+vegetationModelPaths.forEach(url => {
+  loader.load(url, gltf => {
+    const source = gltf.scene.children[0];
+    const geo = source.geometry;
+    const mat = source.material;
+    mat.vertexColors = true; // Allow per-instance colors
+    const inst = new THREE.InstancedMesh(geo, mat, VEGETATION_COUNT);
+    inst.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+    inst.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(VEGETATION_COUNT * 3), 3);
+    scene.add(inst);
+    vegetationMeshes.push(inst);
+    if (vegetationMeshes.length === vegetationModelPaths.length) {
+      populateVegetation(); // Populate once all models are loaded
+    }
+  });
+});
 
 // Utility functions for CPU-side 2D simplex noise matching the shader noise
 function mod289(x){
@@ -238,28 +255,46 @@ function getTerrainHeight(x, z){
 }
 
 function populateVegetation(){
+  if (vegetationMeshes.length === 0) return; // Models not yet loaded
   const dummy = new THREE.Object3D();
-  for(let i=0;i<vegetation.count;i++){
-    const x = (Math.random()-0.5)*1000;
-    const z = (Math.random()-0.5)*1000;
+  const used = vegetationMeshes.map(() => 0); // Track instance counts
+  for (let i = 0; i < VEGETATION_COUNT; i++) {
+    const meshIndex = Math.floor(Math.random() * vegetationMeshes.length);
+    const mesh = vegetationMeshes[meshIndex];
+    const idx = used[meshIndex];
+    const x = (Math.random() - 0.5) * 1000;
+    const z = (Math.random() - 0.5) * 1000;
     dummy.position.set(x, getTerrainHeight(x, z), z);
+    dummy.rotation.y = Math.random() * Math.PI * 2;
+    const s = 0.5 + Math.random();
+    dummy.scale.set(s, s, s);
     dummy.updateMatrix();
-    vegetation.setMatrixAt(i, dummy.matrix);
+    mesh.setMatrixAt(idx, dummy.matrix);
+    const color = new THREE.Color(0x228822);
+    color.offsetHSL(0, 0, (Math.random() - 0.5) * 0.1);
+    mesh.instanceColor.setXYZ(idx, color.r, color.g, color.b);
+    used[meshIndex] = idx + 1;
   }
-  vegetation.instanceMatrix.needsUpdate = true;
-  vegetation.frustumCulled = false;
+  vegetationMeshes.forEach((mesh, i) => {
+    mesh.count = used[i];
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.instanceColor.needsUpdate = true;
+    mesh.frustumCulled = false;
+  });
 }
 
 // Merge static meshes and freeze materials for performance
 function finalizeStatic(){
   const meshes = [];
-  scene.traverse((o)=>{ if(o.isMesh && o !== vegetation) meshes.push(o); });
+  scene.traverse(o => {
+    if (o.isMesh && !vegetationMeshes.includes(o)) meshes.push(o);
+  });
   // Combine all collected geometries into a single mesh for better performance
-  const merged = mergeBufferGeometries(meshes.map(m=>m.geometry));
+  const merged = mergeBufferGeometries(meshes.map(m => m.geometry));
   const finalMesh = new THREE.Mesh(merged, terrainMaterial);
   finalMesh.matrixAutoUpdate = false;
   scene.add(finalMesh);
-  meshes.forEach(m=>scene.remove(m));
+  meshes.forEach(m => scene.remove(m));
 }
 
 export { updateTerrainChunks, updateHeightTexture, populateVegetation, finalizeStatic };
