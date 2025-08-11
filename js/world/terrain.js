@@ -45,6 +45,8 @@ waterMat.onBeforeCompile = (shader) => {
 const water = new THREE.Mesh(waterGeo, waterMat);
 // Let water reflect light but not cast shadows
 water.receiveShadow = true;
+// Place water at the defined sea level so no duplicate plane appears at y=0
+water.position.set(0, SEA_LEVEL, 0);
 
 scene.add(ground);
 scene.add(water);
