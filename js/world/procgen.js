@@ -18,6 +18,8 @@ function mulberry32(a) {
 const loaded = new Map();
 // Queue of chunk loads waiting to be processed
 const loadQueue = [];
+// Flag to avoid scheduling multiple processors
+let queueScheduled = false;
 // Disable procedural object generation by default
 let PROC_ENABLED = false;
 let CHUNK_SIZE = 32;
@@ -98,6 +100,32 @@ function resetChunks() {
   }
 }
 
+// Process queued chunk loads in small time slices to prevent stalls
+function processQueue(deadline) {
+  queueScheduled = false;
+  const start = performance.now();
+  while (
+    loadQueue.length > 0 &&
+    ((deadline && deadline.timeRemaining() > 0) || performance.now() - start < 8)
+  ) {
+    const { cx, cz, lod } = loadQueue.shift();
+    loadChunk(cx, cz, lod);
+  }
+  rebuildAABBs();
+  if (loadQueue.length > 0) scheduleQueueProcessing();
+}
+
+// Schedule queue processing using idle callbacks when available
+function scheduleQueueProcessing() {
+  if (queueScheduled) return;
+  queueScheduled = true;
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(processQueue);
+  } else {
+    setTimeout(processQueue, 0);
+  }
+}
+
 let lastChunkUpdate = 0;
 // Periodically determine which chunks surround the player and load/unload them
 function updateChunks(force = false, forcedPos = null) {
@@ -166,11 +194,8 @@ function updateChunks(force = false, forcedPos = null) {
       unloadChunk(ux, uz);
     }
   }
-  // Load a small batch of queued chunks to avoid stalls
-  for (let i = 0; i < 6 && loadQueue.length > 0; i++) {
-    const { cx, cz, lod } = loadQueue.shift();
-    loadChunk(cx, cz, lod);
-  }
+  // Begin asynchronous processing of queued loads
+  scheduleQueueProcessing();
   rebuildAABBs();
 }
 window.__forceChunkUpdate = (x, z) => updateChunks(true, new THREE.Vector3(x, 0, z));
