@@ -8,8 +8,11 @@ let SEA_LEVEL = 130;
 // Allow the ground plane to expand as view distance increases
 let groundSize = 800;
 const GRID_STEP = 2; // spacing between ground vertices for a smoother mesh
+const MAX_SEGMENTS = 1024; // prevent excessive geometry detail
+const MAX_GROUND_SIZE = GRID_STEP * MAX_SEGMENTS; // cap size to avoid huge arrays
 function createGroundGeo(size) {
-  const seg = Math.max(1, Math.floor(size / GRID_STEP)); // keep detail consistent
+  // Clamp segment count so geometry allocation never overflows
+  const seg = Math.max(1, Math.min(MAX_SEGMENTS, Math.floor(size / GRID_STEP) || 1));
   const geo = new THREE.PlaneGeometry(size, size, seg, seg);
   geo.rotateX(-Math.PI / 2);
   return geo;
@@ -163,8 +166,10 @@ rebuildGround();
 
 // Resize ground mesh when view distance or chunk size changes
 function setGroundSize(newSize) {
-  if (groundSize === newSize) return;
-  groundSize = newSize;
+  // Keep size within reasonable bounds to prevent geometry errors
+  const size = Math.min(MAX_GROUND_SIZE, Math.max(GRID_STEP, newSize));
+  if (groundSize === size) return;
+  groundSize = size;
   ground.geometry.dispose();
   groundGeo = createGroundGeo(groundSize); // rebuild with density based on size
   ground.geometry = groundGeo;
