@@ -27,6 +27,7 @@ This project hosts an interactive 3D world rendered directly in the browser. It 
 ### World generation
 - `world.js` holds scene groups for terrain and utilities for adding or removing meshes.
 - `procgen.js` lazily populates the world with decorative blocks. It divides the plane into chunks and loads or unloads them based on distance from the player. Chunk contents are seeded so the same seed always produces identical geometry.
+  - Chunks load in small batches to minimize stalls when the player moves to new areas.
 - `controls.js` binds UI elements to world options such as seed, mountain amplitude and procedural toggle.
 
 ### Player logic

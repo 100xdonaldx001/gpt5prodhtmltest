@@ -16,6 +16,8 @@ function mulberry32(a) {
 
 // Tracks all loaded chunk groups keyed by their coordinates
 const loaded = new Map();
+// Queue of chunk loads waiting to be processed
+const loadQueue = [];
 // Disable procedural object generation by default
 let PROC_ENABLED = false;
 let CHUNK_SIZE = 32;
@@ -142,15 +144,32 @@ function updateChunks(force = false, forcedPos = null) {
       needed.set(key(nx, nz), lod);
     }
   }
+  // Add newly needed chunks to the queue if not already loaded
   needed.forEach((lod, k) => {
     const [sx, sz] = k.split(',').map(Number);
-    loadChunk(sx, sz, lod);
+    const rec = loaded.get(k);
+    if (!rec || rec.lod !== lod) {
+      if (!loadQueue.find((q) => q.k === k)) {
+        // Record coordinates and LOD for later loading
+        loadQueue.push({ k, cx: sx, cz: sz, lod });
+      }
+    }
   });
+  // Drop queued loads that are no longer required
+  for (let i = loadQueue.length - 1; i >= 0; i--) {
+    if (!needed.has(loadQueue[i].k)) loadQueue.splice(i, 1);
+  }
+  // Remove chunks that fall outside the needed set
   for (const k of Array.from(loaded.keys())) {
     if (!needed.has(k)) {
       const [ux, uz] = k.split(',').map(Number);
       unloadChunk(ux, uz);
     }
+  }
+  // Load a small batch of queued chunks to avoid stalls
+  for (let i = 0; i < 6 && loadQueue.length > 0; i++) {
+    const { cx, cz, lod } = loadQueue.shift();
+    loadChunk(cx, cz, lod);
   }
   rebuildAABBs();
 }
