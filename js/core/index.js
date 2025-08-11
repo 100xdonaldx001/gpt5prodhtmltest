@@ -89,3 +89,4 @@ export {
 } from './dom.js';
 export { state, setWorldSeed, setTerrainAmps, setTerrainType } from './state.js';
 export { alignPlayerToGround } from '../world/controls.js';
+export { initWeather, setWeather, getWeather, updateWeather } from './weather.js';
