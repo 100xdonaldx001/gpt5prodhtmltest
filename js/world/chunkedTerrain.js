@@ -176,14 +176,16 @@ const fullscreenScene = new THREE.Scene();
 const fullscreenCamera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
 fullscreenScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), heightMaterial));
 
-// Load tree and shrub models for instanced vegetation
+// Load vegetation models for instanced vegetation
 const loader = new GLTFLoader();
 const VEGETATION_COUNT = 2000;
 const vegetationMeshes = [];
 const vegetationModelPaths = [
   'models/tree.gltf',
-  'models/shrub.gltf'
-];
+  'models/shrub.gltf',
+  'models/bush.gltf',
+  'models/grass.gltf'
+]; // Include additional vegetation meshes
 vegetationModelPaths.forEach(url => {
   loader.load(url, gltf => {
     const source = gltf.scene.children[0];
